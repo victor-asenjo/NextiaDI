@@ -1,0 +1,84 @@
+@prefix : <http://lod.openaire.eu/vocab/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix owl2: <http://www.w3.org/2006/12/owl2#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix frapo: <http://purl.org/cerif/frapo/> .
+@prefix dg: <https://w3id.org/dingo#> .
+@prefix schema: <http://schema.org/> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix cerif: <http://eurocris.org/ontology/cerif#> .
+@prefix oegp: <webode://droz.dia.fi.upm.es/Project+Ontology#> .
+
+
+###########################################
+# METADATA
+###########################################
+
+: a owl:Ontology ;
+      rdfs:label "OpenAire Ontology"@en ;
+      rdfs:comment "OpenAire"@en .
+
+
+###########################################
+# OBJECT PROPERTIES
+###########################################
+:participant rdf:type owl:ObjectProperty ;
+             rdfs:domain :ProjectEntity;
+             rdfs:range  :Role ;
+             rdfs:label "participant"@en.
+
+:entity_taking_role a rdf:Property ;
+             rdfs:label "entity_taking_role" ;
+             rdfs:comment "The person or organisation or entity (object) assuming or to whom is assigned the role (subject)." ;
+             rdfs:domain :Role ;
+             rdfs:range :OrganisationEntity .
+
+:legalName a rdf:Property ;
+             rdfs:label "legalName" ;
+             rdfs:comment "The official name of the organization, for example the registered company name." ;
+             rdfs:domain :OrganisationEntity ;
+             rdfs:range xsd:string ;
+             owl:equivalentProperty schema:legalName .
+
+:country a rdf:Property ;
+    rdfs:label "country" ;
+    rdfs:comment "Country where the organisation is located ufficially." ;
+    rdfs:domain :OrganisationEntity ;
+    rdfs:range xsd:string .
+#    rdfs:range schema:Country ;
+
+###########################################
+# DATA PROPERTIES
+###########################################
+
+:title rdf:type owl:DatatypeProperty ;
+       rdfs:domain :ProjectEntity;
+       rdfs:range xsd:string ;
+       rdfs:comment "The entity’s (e.g. project, work package, etc.) official name or title."@en ;
+       rdfs:label "title"@en.
+
+
+###########################################
+# CLASSES
+###########################################
+
+
+
+:ProjectEntity rdf:type owl:Class ;
+         rdfs:label "Project entity"@en .
+
+:OrganisationEntity rdf:type owl:Class ;
+               rdfs:label "Organization entity"@en .
+
+
+:Role rdf:type owl:Class ;
+         rdfs:label "Role"@en .

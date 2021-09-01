@@ -1,8 +1,8 @@
 package edu.upc.essi.dtim.nextiadi.jena;
 
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
-import edu.upc.essi.dtim.nextiadi.utils.Alignment;
-import edu.upc.essi.dtim.nextiadi.utils.models.Subject;
+import edu.upc.essi.dtim.nextiadi.models.Alignment;
+import edu.upc.essi.dtim.nextiadi.models.Subject;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.jena.query.*;

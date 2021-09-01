@@ -1,0 +1,95 @@
+</bikes.json.coordinates>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                </bikes.json> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq1> .
+
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2.id>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#integer> .
+
+</bikes.json.id>  a  <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                </bikes.json> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#integer> .
+
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2>
+        a       <http://www.w3.org/2000/01/rdf-schema#Class> .
+
+</bikes.json.Object1.streetNumber>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                </bikes.json.Object1> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#integer> .
+
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq> .
+
+</bikes.json.type>  a  <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                </bikes.json> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#string> .
+
+<http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty2>
+        a       <http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2> .
+
+</bikes.json>  a  <http://www.w3.org/2000/01/rdf-schema#Class> .
+
+</bikes.json.Object1>
+        a       <http://www.w3.org/2000/01/rdf-schema#Class> .
+
+</bikes.json.address>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                </bikes.json> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                </bikes.json.Object1> .
+
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2.type>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#string> .
+
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2.distance>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2.Object2> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#integer> .
+
+</bikes.json.nearbyStations>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                </bikes.json> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq2> .
+
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq1>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq> .
+
+</bikes.json.Object1.streetName>
+        a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                </bikes.json.Object1> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#string> .
+
+<http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty1>
+        a       <http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq1> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#integer> .

@@ -1,0 +1,195 @@
+@prefix :     <http://www.villo.com/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml:  <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+:bike_stands  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  :Bike_Station ;
+        rdfs:range   xsd:string .
+
+<http://www.bicing.com/Bicing_service>
+        rdf:type  owl:Class .
+
+<http://www.bicing.com/has_bicycle>
+        rdf:type     owl:ObjectProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_info> ;
+        rdfs:range   <http://www.bicing.com/Data_collection> .
+
+:model  rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  :Bikes_information ;
+        rdfs:range   xsd:string .
+
+:has_station  rdf:type  owl:ObjectProperty ;
+        rdfs:domain  :Villo ;
+        rdfs:range   :Bike_Station .
+
+<http://www.bicing.com/physical_conf>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range   xsd:string .
+
+:available  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  :Bike_Station ;
+        rdfs:range   xsd:string .
+
+:       rdf:type  owl:Ontology .
+
+<http://www.bicing.com/manufacturer>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_info> ;
+        rdfs:range   xsd:string .
+
+:capacity  rdf:type         owl:DatatypeProperty ;
+        rdfs:domain         :Bike_Station ;
+        rdfs:range          xsd:string ;
+        rdfs:subPropertyOf  <http://www.essi.upc.edu/dtim/ontology/Global/capacity> .
+
+<http://www.bicing.com/>
+        rdf:type  owl:Ontology .
+
+<http://www.bicing.com/name>
+        rdf:type            owl:DatatypeProperty ;
+        rdfs:domain         <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range          xsd:string ;
+        rdfs:subPropertyOf  <http://www.essi.upc.edu/dtim/ontology/Global/station_name> .
+
+<http://www.bicing.com/latitude>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range   xsd:decimal .
+
+<http://www.bicing.com/post_code>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range   xsd:string .
+
+<http://www.bicing.com/station_id>
+        rdf:type            owl:DatatypeProperty ;
+        rdfs:domain         <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range          xsd:string ;
+        rdfs:subPropertyOf  <http://www.essi.upc.edu/dtim/ontology/Global/station_id> .
+
+<http://www.bicing.com/has_station>
+        rdf:type     owl:ObjectProperty ;
+        rdfs:domain  <http://www.bicing.com/Data_collection> ;
+        rdfs:range   <http://www.bicing.com/Bicycle_Station> .
+
+:name   rdf:type            owl:DatatypeProperty ;
+        rdfs:domain         :Bike_Station ;
+        rdfs:range          xsd:string ;
+        rdfs:subPropertyOf  <http://www.essi.upc.edu/dtim/ontology/Global/station_name> .
+
+<http://www.bicing.com/Data_collection>
+        rdf:type  owl:Class .
+
+<http://www.bicing.com/altitude>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range   xsd:decimal .
+
+:dataset_id  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  :Villo ;
+        rdfs:range   xsd:string .
+
+:has_bike  rdf:type  owl:ObjectProperty ;
+        rdfs:domain  :Bikes_information ;
+        rdfs:range   :Villo .
+
+<http://www.bicing.com/Bicycle_info>
+        rdf:type  owl:Class .
+
+<http://www.bicing.com/Bicycle_Station>
+        rdf:type         owl:Class ;
+        rdfs:subClassOf  <http://www.essi.upc.edu/dtim/ontology/Global/Bike_station> .
+
+:Bikes_information  rdf:type  owl:Class .
+
+:purchase_year  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  :Bikes_information ;
+        rdfs:range   xsd:nonNegativeInteger .
+
+:latitude  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  :Bike_Station ;
+        rdfs:range   xsd:decimal .
+
+:id     rdf:type            owl:DatatypeProperty ;
+        rdfs:domain         :Bike_Station ;
+        rdfs:range          xsd:string ;
+        rdfs:subPropertyOf  <http://www.essi.upc.edu/dtim/ontology/Global/station_id> .
+
+:Bike_Station  rdf:type  owl:Class ;
+        rdfs:subClassOf  <http://www.essi.upc.edu/dtim/ontology/Global/Bike_station> .
+
+:Villo  rdf:type  owl:Class .
+
+<http://www.bicing.com/year_of_purchase>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_info> ;
+        rdfs:range   xsd:nonNegativeInteger .
+
+<http://www.bicing.com/identifier>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicing_service> ;
+        rdfs:range   xsd:string .
+
+<http://www.essi.upc.edu/dtim/ontology/Global/station_name>
+        rdf:type     <http://www.essi.upc.edu/dtim/ontology/Global/IntegrationDProperty> ;
+        rdfs:domain  <http://www.essi.upc.edu/dtim/ontology/Global/Bike_station> ;
+        rdfs:range   xsd:string .
+
+<http://www.bicing.com/address>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range   xsd:string .
+
+:address  rdf:type   owl:DatatypeProperty ;
+        rdfs:domain  :Bike_Station ;
+        rdfs:range   xsd:string .
+
+<http://www.bicing.com/has_data>
+        rdf:type     owl:ObjectProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicing_service> ;
+        rdfs:range   <http://www.bicing.com/Data_collection> .
+
+:banking  rdf:type   owl:DatatypeProperty ;
+        rdfs:domain  :Bike_Station ;
+        rdfs:range   xsd:string .
+
+<http://www.essi.upc.edu/dtim/ontology/Global/capacity>
+        rdf:type     <http://www.essi.upc.edu/dtim/ontology/Global/IntegrationDProperty> ;
+        rdfs:domain  <http://www.essi.upc.edu/dtim/ontology/Global/Bike_station> ;
+        rdfs:range   xsd:string .
+
+<http://www.essi.upc.edu/dtim/ontology/Global/Bike_station>
+        rdf:type  <http://www.essi.upc.edu/dtim/ontology/Global/IntegrationClass> .
+
+<http://www.bicing.com/capacity>
+        rdf:type            owl:DatatypeProperty ;
+        rdfs:domain         <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range          xsd:string ;
+        rdfs:subPropertyOf  <http://www.essi.upc.edu/dtim/ontology/Global/capacity> .
+
+:information  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  :Bikes_information ;
+        rdfs:range   xsd:string .
+
+<http://www.essi.upc.edu/dtim/ontology/Global/station_id>
+        rdf:type     <http://www.essi.upc.edu/dtim/ontology/Global/IntegrationDProperty> ;
+        rdfs:domain  <http://www.essi.upc.edu/dtim/ontology/Global/Bike_station> ;
+        rdfs:range   xsd:string .
+
+<http://www.bicing.com/information>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_info> ;
+        rdfs:range   xsd:string .
+
+<http://www.bicing.com/longitude>
+        rdf:type     owl:DatatypeProperty ;
+        rdfs:domain  <http://www.bicing.com/Bicycle_Station> ;
+        rdfs:range   xsd:decimal .
+
+:longitude  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  :Bike_Station ;
+        rdfs:range   xsd:decimal .
