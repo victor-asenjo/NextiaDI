@@ -2,26 +2,22 @@ package edu.upc.essi.dtim.nextiadi.bootstraping;
 
 
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 
 import javax.json.*;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * Generates an RDFS-compliant representation of a JSON's document schema
  * @author snadal
  */
-public class JSONBootstrap {
+public class JSONBootstrap_new {
 
 	private int ObjectCounter = 1;
 	private int SeqCounter = 1;
@@ -29,7 +25,7 @@ public class JSONBootstrap {
 
 	private Graph Σ;
 
-	public JSONBootstrap(){
+	public JSONBootstrap_new(){
 		reset();
 	}
 
@@ -85,44 +81,54 @@ public class JSONBootstrap {
 		if (φ.getValueType() == JsonValue.ValueType.STRING) LiteralString((JsonString)φ, P);
 		else if (φ.getValueType() == JsonValue.ValueType.NUMBER) LiteralNumber((JsonNumber)φ, P);
 		else if (φ.getValueType() == JsonValue.ValueType.OBJECT) Object((JsonObject)φ, P);
-		else if (φ.getValueType() == JsonValue.ValueType.ARRAY) Array((JsonArray)φ, P);
+		else if (φ.getValueType() == JsonValue.ValueType.ARRAY) Array((JsonArray)φ, P, "Object");
 	}
 
 	private void Object (JsonObject φ, String P) {
 		φ.keySet().forEach(k -> {
 			JsonValue v = φ.get(k);
 
-			Σ.add(P+"."+k, RDF.type, RDF.Property);
-			Σ.add( P+"."+k, RDFS.domain, new ResourceImpl(P) );
-//			addTriple(Σ,"G",new ResourceImpl(P+"."+k), RDF.type, RDF.Property);
-//			addTriple(Σ,"G",new ResourceImpl(P+"."+k), RDFS.domain, new ResourceImpl(P));
+//			Σ.add(P+".has_"+k, RDF.type, RDF.Property);
+//			Σ.add( P+".has_"+k, RDFS.domain, new ResourceImpl(P) );
 
-			if (v.getValueType() == JsonValue.ValueType.STRING) LiteralString((JsonString)v, P+"."+k);
-			else if (v.getValueType() == JsonValue.ValueType.NUMBER) LiteralNumber((JsonNumber) v, P+"."+k);
-			else if (v.getValueType() == JsonValue.ValueType.OBJECT) {
-				String u = "Object"+ObjectCounter; ObjectCounter++;
-				Σ.add(P+"."+k, RDFS.range, P+"."+u);
+//			addTriple(Σ,"G",new ResourceImpl(P+".has_"+k), RDF.type, RDF.Property);
+//			addTriple(Σ,"G",new ResourceImpl(P+".has_"+k), RDFS.domain, new ResourceImpl(P));
+
+			String property = P + ".has_" + k;
+
+			if (v.getValueType() == JsonValue.ValueType.STRING) {
+				property = P + "." +k;
+				LiteralString((JsonString)v, property);
+			} else if (v.getValueType() == JsonValue.ValueType.NUMBER) {
+				property = P + "." +k;
+				LiteralNumber((JsonNumber) v, property);
+			} else if (v.getValueType() == JsonValue.ValueType.OBJECT) {
+				String u = k; ObjectCounter++;
+				Σ.add(P+".has_"+k, RDFS.range, P+"."+u);
 				Object((JsonObject)v,P+"."+u);
 			}
 			else if (v.getValueType() == JsonValue.ValueType.ARRAY) {
-				String u = RDF.Seq.getURI() + SeqCounter; SeqCounter++;
+				String u = P +".Seq" + SeqCounter; SeqCounter++;
 				Σ.add(u, RDF.type, RDF.Seq);
-				Σ.add( P + "." + k, RDFS.range, u);
-				Array((JsonArray) v, u);
+				Σ.add( P + ".has_" + k, RDFS.range, u);
+				Array((JsonArray) v, u, k);
 			}
+
+			Σ.add(property, RDF.type, RDF.Property);
+			Σ.add( property, RDFS.domain, new ResourceImpl(P) );
 		});
 		Σ.add(P, RDF.type, RDFS.Class);
 	}
 
-	private void Array (JsonArray φ, String P) {
-		String uu = RDFS.ContainerMembershipProperty.getURI()+CMPCounter; CMPCounter++;
+	private void Array (JsonArray φ, String P, String key) {
+		String uu = P+".ContainerMembershipProperty"+CMPCounter; CMPCounter++;
 		Σ.add(uu, RDF.type, RDFS.ContainerMembershipProperty);
 		Σ.add(uu, RDFS.domain, P);
 		JsonValue v = φ.get(0);
 		if (v.getValueType() == JsonValue.ValueType.STRING || v.getValueType() == JsonValue.ValueType.NUMBER) {
 			Value(φ.get(0), uu);
 		} else if (v.getValueType() == JsonValue.ValueType.OBJECT) {
-			String u = "Object" + ObjectCounter; ObjectCounter++;
+			String u = key; ObjectCounter++;
 			Σ.add( uu, RDFS.range, P + "." + u);
 			Value(φ.get(0), P + "." + u);
 		}

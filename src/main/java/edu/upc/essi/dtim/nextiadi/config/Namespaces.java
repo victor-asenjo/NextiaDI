@@ -2,7 +2,8 @@ package edu.upc.essi.dtim.nextiadi.config;
 
 public enum Namespaces {
 
-    G("http://www.essi.upc.edu/dtim/ontology/Global/");
+    G("http://www.essi.upc.edu/DTIM/"),
+    NextiaDI("http://www.essi.upc.edu/DTIM/NextiaDI/");
 
     private String element;
 

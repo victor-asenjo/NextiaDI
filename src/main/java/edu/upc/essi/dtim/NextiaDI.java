@@ -15,40 +15,50 @@ import java.util.stream.Collectors;
 
 public class NextiaDI {
 
-    Graph graphO = new Graph();
+    Graph graphO;
     List<Alignment> unused;
 
     public NextiaDI(){
+       reset();
+    }
+
+
+    public void reset(){
+
+        graphO  = new Graph();
         unused = new ArrayList<>();
     }
 
+
     public Model Integrate(Model graphA, Model graphB, List<Alignment> alignments){
 
-        List<Alignment> classes = alignments.stream().filter( a -> a.getType().contains("class") ).collect(Collectors.toList());
-        List<Alignment> datatypes = alignments.stream().filter( a -> a.getType().contains("datatype") ).collect(Collectors.toList());
-        List<Alignment> properties = alignments.stream().filter( a -> a.getType().contains("object") ).collect(Collectors.toList());
+        List<Alignment> classes = alignments.stream().filter( a -> a.getType().toLowerCase().contains("class") ).collect(Collectors.toList());
+        List<Alignment> datatypes = alignments.stream().filter( a -> a.getType().toLowerCase().contains("datatype") ).collect(Collectors.toList());
+        List<Alignment> properties = alignments.stream().filter( a -> a.getType().toLowerCase().contains("object") ).collect(Collectors.toList());
 
         return Integrate(graphA, graphB, classes, datatypes, properties, new ArrayList<>());
-
     }
+
 
     public Model Integrate(Model graphA, Model graphB, List<Alignment> alignments, List<Alignment> unused){
 
-        List<Alignment> classes = alignments.stream().filter( a -> a.getType().contains("class") ).collect(Collectors.toList());
-        List<Alignment> datatypes = alignments.stream().filter( a -> a.getType().contains("datatype") ).collect(Collectors.toList());
-        List<Alignment> properties = alignments.stream().filter( a -> a.getType().contains("object") ).collect(Collectors.toList());
+        List<Alignment> classes = alignments.stream().filter( a -> a.getType().toLowerCase().contains("class") ).collect(Collectors.toList());
+        List<Alignment> datatypes = alignments.stream().filter( a -> a.getType().toLowerCase().contains("datatype") ).collect(Collectors.toList());
+        List<Alignment> properties = alignments.stream().filter( a -> a.getType().toLowerCase().contains("object") ).collect(Collectors.toList());
 
         return  Integrate(graphA, graphB, classes, datatypes, properties, unused);
-
     }
 
     public Model Integrate(Model graphA, Model graphB, List<Alignment> Ac, List<Alignment> ADT, List<Alignment> AO, List<Alignment> unused ) {
+        reset();
         this.unused = unused;
+
         Model integratedGraph = graphA.union(graphB);
         graphO.setModel(integratedGraph);
-        graphO.generateMetaModel();
+
         IntegrateClasses( Ac );
         IntegrateDatatypeProperties(ADT);
+        IntegrateObjectProperties(AO);
         return graphO.getModel();
     }
 
@@ -56,7 +66,7 @@ public class NextiaDI {
         return unused;
     }
 
-    public List<Alignment> IntegrateClasses( List<Alignment> Ac) {
+    public void IntegrateClasses( List<Alignment> Ac) {
 
         for (Alignment a : Ac) {
 
@@ -71,9 +81,8 @@ public class NextiaDI {
                 graphO.add(a.getIriA(), RDFS.subClassOf.getURI(), a.getIriL());
                 graphO.add(a.getIriB(), RDFS.subClassOf.getURI(), a.getIriL());
             }
-            unused = performConcordanceProperties( graphO.performConcordanceProperties(a.getIriL(), unused)) ;
+            unused = performConcordanceProperties( graphO.getUnusedPropertiesReadyToIntegrate(a.getIriL(), unused)) ;
         }
-        return unused;
 
     }
 
@@ -99,7 +108,7 @@ public class NextiaDI {
             if( graphO.isIntegratedClass(domainA) & domainA.equals(domainB) ) {
 
                 if( graphO.isIntegratedDatatypeProperty(a.getIriA()) & graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
-
+                    graphO.replaceIntegratedProperty(a);
                 } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
                     graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriB() );
                 } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
@@ -107,7 +116,7 @@ public class NextiaDI {
                 } else {
                     graphO.add(a.getIriL(), RDF.type.getURI(), Vocabulary.IntegrationDProperty.val());
 
-                    System.out.println(a.getIriL()+" - "+RDF.type.getURI()+" - "+Vocabulary.IntegrationDProperty.val());
+//                    System.out.println(a.getIriL()+" - "+RDF.type.getURI()+" - "+Vocabulary.IntegrationDProperty.val());
 
                     graphO.add(a.getIriA(), RDFS.subPropertyOf.getURI(), a.getIriL());
                     graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriL());
@@ -138,7 +147,7 @@ public class NextiaDI {
             if( graphO.isIntegratedClass(domainA) & domainA.equals(domainB) & graphO.isIntegratedClass(rangeA) & rangeA.equals(rangeB) ) {
 
                 if( graphO.isIntegratedDatatypeProperty(a.getIriA()) & graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
-
+                    graphO.replaceIntegratedProperty(a);
                 } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
                     graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriB() );
                 } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
@@ -161,6 +170,10 @@ public class NextiaDI {
         return unused;
     }
 
+    public Model getOnlyIntegrationResources(){
+        return graphO.generateOnlyIntegrations();
+    }
+
     public Model getMinimalGraph(){
         Graph minimalG = new Graph();
 
@@ -168,11 +181,11 @@ public class NextiaDI {
 
         minimalG.test();
 //        minimalG.minimalIDProperties();
-        minimalG.minimalIOProperties();
-        minimalG.minimalClasses();
-minimalG.removeMetaModel();
+//        minimalG.minimalIOProperties();
+//        minimalG.minimalClasses();
+//        minimalG.removeMetaModel();
 
-        return minimalG.getModel();
+        return minimalG.minimalClassesConstruct();
 
 
 

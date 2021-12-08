@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sys.JenaSystem;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -24,13 +25,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Getter @Setter
+@Getter
 public class Graph {
 
     private Model model;
 
     public Graph(){
+//        org.apache.jena.query.ARQ.init();
+        JenaSystem.init();
         model = ModelFactory.createDefaultModel();
+    }
+
+    public void setModel(Model model){
+        this.model.add(model);
     }
 
     public void add(String subject, String predicate, String object) {
@@ -105,6 +112,14 @@ public class Graph {
 
     }
 
+    public void replaceIntegratedProperty(Alignment alignment) {
+
+
+        updateProperty(alignment.getIriA(), alignment.getIriL());
+        updateProperty(alignment.getIriB(), alignment.getIriL());
+
+    }
+
 
     /**
      * Delete triple with oldIri and insert new triple with newIri in jena graph
@@ -118,6 +133,45 @@ public class Graph {
         // Look and update triples where oldIRI is subject.
         runAnUpdateQuery("DELETE {<"+oldIRI+"> ?p ?o} " +
                 "INSERT {<"+newIRI+"> ?p ?o} WHERE {  <"+oldIRI+"> ?p ?o }");
+    }
+
+    public Model generateOnlyIntegrations(){
+        // Look and update triples where oldIRI is object.
+        String querySTR = "CONSTRUCT {?s ?p ?o. ?sub ?p1 ?s.} " +
+                "WHERE { " +
+                "?sub ?p1 ?s." +
+                "{" +
+                " ?s <"+RDF.type.getURI()+"> <"+ Vocabulary.IntegrationClass.val() +"> . " +
+                " ?s ?p ?o. " +
+                "}" +
+                " UNION {" +
+                " ?s <"+RDF.type.getURI()+"> <"+ Vocabulary.IntegrationDProperty.val() +">. " +
+                " ?s ?p ?o. " +
+                "}" +
+                " UNION { " +
+                "?s <"+RDF.type.getURI()+"> <"+ Vocabulary.IntegrationOProperty +">. " +
+                " ?s ?p ?o. " +
+                "}" +
+                "}";
+
+
+
+        Query query = QueryFactory.create(querySTR);
+        QueryExecution qexec = QueryExecutionFactory.create(query, model);
+        Model results = qexec.execConstruct();
+        return results;
+    }
+
+    public void updateProperty(String oldIRI, String newIRI){
+        // Look and update triples where oldIRI is object.
+        runAnUpdateQuery("DELETE {?s ?p <"+oldIRI+">} " +
+                "INSERT {?s ?p <"+newIRI+">} WHERE {  ?s ?p <"+oldIRI+"> }");
+        // Look and update triples where oldIRI is subject.
+        runAnUpdateQuery("DELETE {<"+oldIRI+"> ?p ?o} " +
+                "INSERT {<"+newIRI+"> ?p ?o} WHERE {  <"+oldIRI+"> ?p ?o }");
+
+//        runAnUpdateQuery("DELETE {<"+oldIRI+"> <"+RDF.type.getURI()+"> ?type} " +
+//                "INSERT { <"+newIRI+"> <"+RDF.type.getURI()+"> ?type } WHERE {  <"+oldIRI+"> <"+RDF.type.getURI()+"> ?type }");
     }
 
     public  void runAnUpdateQuery(String sparqlQuery) {
@@ -136,6 +190,7 @@ public class Graph {
             qExec.close();
             return results;
         } catch (Exception e) {
+//            System.out.println("error runAqEURY");
             e.printStackTrace();
         }
         return null;
@@ -308,11 +363,49 @@ public class Graph {
                 "} WHERE { " +
                 " ?integratedD rdf:type <"+Vocabulary.IntegrationClass.val()+">." +
                 " ?s rdfs:subClassOf ?integratedD."  +
-                " ?property ?dr ?s." +
+                " ?property rdfs:domain | rdfs:range ?s." +
                 " ?s rdf:type ?type." +
-                " FILTER (?dr = rdfs:domain || ?dr = rdfs:range )" +
+//                " FILTER (?dr = rdfs:domain || ?dr = rdfs:range )" +
                 " }";
+
         runAnUpdateQuery(queryD);
+    }
+
+    public Model minimalClassesConstruct(){
+        // I think where can be improve
+        String querySTR = "PREFIX rdfs: <"+RDFS.getURI()+">" +
+                "PREFIX rdf: <"+RDF.getURI()+">" +
+                "CONSTRUCT {" +
+                " ?integratedC rdf:type <"+Vocabulary.IntegrationClass.val()+">.  " +
+                " ?s ?dr ?integratedC. " +  // represent domain and range of integrated properties
+                " ?s rdf:type ?typeS. " +
+                " ?s rdfs:range ?rangeS. " +
+                " ?dataProperty rdfs:domain ?integratedC." +
+                " ?dataProperty rdf:type ?dataPropertyType."+
+                " ?dataProperty rdfs:range ?range. " +
+                "} WHERE {" +
+                " ?integratedC rdf:type <"+Vocabulary.IntegrationClass.val()+">.  " +
+                " ?s ?dr ?integratedC. " + // retrieves properties with domain and range...
+                " ?s rdf:type ?typeS. " +
+                " OPTIONAL{ " +
+                "   ?s rdfs:range ?rangeS  " + // for data types
+                " }" +
+                " ?subclass rdfs:subClassOf ?integratedC. " +
+                " ?subclass rdf:type ?type." +
+                " OPTIONAL { " +
+                "   ?dataProperty rdfs:domain ?subclass." +
+                "   ?dataProperty rdfs:range ?range.  " +
+                "   ?dataProperty rdf:type ?dataPropertyType. " +
+                "}  " +
+                " FILTER NOT EXISTS {?dataProperty rdfs:subPropertyOf ?sub. ?sub rdf:type <"+Vocabulary.IntegrationDProperty.val()+">}" +
+                " FILTER (?dr = rdfs:domain || ?dr = rdfs:range )" +
+                "}  ";
+
+
+        Query query = QueryFactory.create(querySTR);
+        QueryExecution qexec = QueryExecutionFactory.create(query, model);
+        Model results = qexec.execConstruct();
+        return results;
     }
 
 
@@ -347,19 +440,35 @@ public class Graph {
 
     }
 
+    public String getResources(String property) {
+
+        String range = getRange(property);
+
+        String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+                "SELECT ?resource WHERE { {?class rdf:type rdfs:Class} .}";
+        List<String> result =  getVar(query, "resource");
+        if(result.isEmpty()){
+            return range;
+        } else {
+            return result.get(0);
+        }
+
+    }
+
+
     public String getSuperDomainFromProperty(String property) {
 
         String domain = getDomain(property);
 
         String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
                 "SELECT ?superClass WHERE { <"+domain+"> rdfs:subClassOf ?superClass.}";
-        System.out.println(query);
+//        System.out.println(query);
         List<String> result = getVar(query, "superClass");
         if(result.isEmpty()){
-            System.out.println("default domain is: "+domain);
+//            System.out.println("default domain is: "+domain);
             return domain;
         } else {
-            System.out.println(result.get(0));
+//            System.out.println(result.get(0));
             return result.get(0);
         }
     }
@@ -385,7 +494,7 @@ public class Graph {
             rows.add(solution.getResource(varname).getURI());
         }
         if(rows.isEmpty()){
-            System.out.println("error, no "+varname+" definition....");
+//            System.out.println("error, no "+varname+" definition....");
         }
         return rows;
     }
@@ -418,36 +527,41 @@ public class Graph {
         model.read(path, "TURTLE");
     }
 
-    public Map<String,List<Alignment>> performConcordanceProperties(String uri, List<Alignment> alignments){
+    public Map<String,List<Alignment>> getUnusedPropertiesReadyToIntegrate(String uri, List<Alignment> alignments){
 
         List properties = new ArrayList();
-        String prefix = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ";
-        String query1 = prefix + "SELECT ?class WHERE { ?class rdfs:subClassOf <"+uri+">.}";
-        String query2 = prefix + "SELECT ?property WHERE { ?property rdfs:subClassOf <%s>.}";
-        for ( String c : getVar(query1, "class") ) {
-            for (String p : getVar( String.format(query2, c) , "property") ) {
-                properties.add(p);
-            }
-
-        }
-
-
-
         List<Alignment> datatypes = new ArrayList();
         List<Alignment> object = new ArrayList();
-        for (Alignment a: alignments) {
+        if(alignments.size() > 0) {
 
-            if(properties.contains(a.getIriA()) & properties.contains(a.getIriB() )) {
-
-                if ( contains(a.getIriA(), RDF.type.getURI(), OWL.DatatypeProperty.getURI()) ) {
-                    datatypes.add(a);
-                } else {
-                    object.add(a);
+            String prefix = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ";
+            String query1 = prefix + "SELECT ?class WHERE { ?class rdfs:subClassOf <"+uri+">.}";
+            String query2 = prefix + "SELECT ?property WHERE { ?property rdfs:domain <%s>.}";
+            for ( String c : getVar(query1, "class") ) {
+                for (String p : getVar( String.format(query2, c) , "property") ) {
+                    properties.add(p);
                 }
 
             }
 
+
+            for (Alignment a: alignments) {
+
+                if(properties.contains(a.getIriA()) & properties.contains(a.getIriB() )) {
+
+                    if ( contains(a.getIriA(), RDF.type.getURI(), OWL.DatatypeProperty.getURI()) ) {
+                        datatypes.add(a);
+                    } else {
+                        object.add(a);
+                    }
+
+                }
+
+            }
+
+
         }
+
 
         Map<String,List<Alignment>> map =new HashMap();
         map.put("datatype",datatypes);

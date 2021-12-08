@@ -4,14 +4,17 @@ import edu.upc.essi.dtim.nextiadi.config.Namespaces;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class Alignment {
+public class Alignment implements Serializable {
 
     String iriA;
     String iriB;
     String l;
     String type;
+    Boolean identifier;
 //    String score?
 
     public Alignment(){
@@ -31,8 +34,16 @@ public class Alignment {
         this.type = type;
     }
 
+    public Alignment(String iriA, String iriB, String l, String type, Boolean identifier) {
+        this.iriA = iriA;
+        this.iriB = iriB;
+        this.l = l;
+        this.type = type;
+        this.identifier = identifier;
+    }
+
 
     public String getIriL() {
-        return Namespaces.G.val() + l;
+        return Namespaces.NextiaDI.val() + l;
     }
 }
