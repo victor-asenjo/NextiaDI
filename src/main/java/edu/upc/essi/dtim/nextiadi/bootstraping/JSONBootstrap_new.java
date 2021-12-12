@@ -2,6 +2,11 @@ package edu.upc.essi.dtim.nextiadi.bootstraping;
 
 
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jena.atlas.lib.tuple.Tuple2;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.vocabulary.RDF;
@@ -11,12 +16,18 @@ import org.apache.jena.vocabulary.XSD;
 import javax.json.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Generates an RDFS-compliant representation of a JSON's document schema
  * @author snadal
  */
+@Getter
+@Setter
 public class JSONBootstrap_new {
 
 	private int ObjectCounter = 1;
@@ -24,6 +35,9 @@ public class JSONBootstrap_new {
 	private int CMPCounter = 1;
 
 	private Graph Σ;
+
+	private List<Pair<String,String>> attributes;
+	private List<Pair<String,String>> lateralViews;
 
 	public JSONBootstrap_new(){
 		reset();
@@ -34,6 +48,9 @@ public class JSONBootstrap_new {
 		ObjectCounter = 1;
 		SeqCounter = 1;
 		CMPCounter = 1;
+
+		attributes = Lists.newArrayList();
+		lateralViews = Lists.newArrayList();
 	}
 
 
@@ -132,14 +149,17 @@ public class JSONBootstrap_new {
 			Σ.add( uu, RDFS.range, P + "." + u);
 			Value(φ.get(0), P + "." + u);
 		}
+		lateralViews.add(Pair.of(key,P+"."+key));
 	}
 
 	private void LiteralString (JsonString φ,  String P) {
 		Σ.add(P,RDFS.range,XSD.xstring);
+		attributes.add(Pair.of(P,P));
 	}
 
 	private void LiteralNumber (JsonNumber φ, String P) {
 		Σ.add( P, RDFS.range, XSD.integer);
+		attributes.add(Pair.of(P,P));
 	}
 
 //	private static void addTriple(Dataset d, String namedGraph, Resource s, Property p, Resource o){
@@ -149,5 +169,36 @@ public class JSONBootstrap_new {
 //		});
 //	}
 
+
+
+	public static void main(String[] args) throws IOException {
+		JSONBootstrap_new j = new JSONBootstrap_new();
+		String D = "stations";
+
+		Model M = j.bootstrap(D,"src/main/resources/stations.json");
+
+		Graph G = new Graph();
+		G.setModel(M);
+		java.nio.file.Path temp = Files.createTempFile("bootstrap",".g");
+		System.out.println("Graph written to "+temp);
+		G.write(temp.toString(),org.apache.jena.riot.Lang.TTL);
+
+		System.out.println("Attributes");
+		System.out.println(j.getAttributes());
+
+		System.out.println("Lateral views");
+		System.out.println(j.getLateralViews());
+
+
+		List<Pair<String,String>> attributes = j.getAttributes();
+		List<Pair<String,String>> lateralViews = j.getLateralViews();
+
+		String SELECT = attributes.stream().map(p -> p.getLeft()).collect(Collectors.joining(","));
+		String FROM = D;
+		String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode("+p.getLeft()+") AS "+p.getRight()).collect(Collectors.joining("\n"));
+
+		String impl = SELECT + " \n" + D + " \n" + LATERAL;
+		System.out.println(impl);
+	}
 }
 
