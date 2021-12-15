@@ -45,6 +45,16 @@ public class Graph {
         r.addProperty(model.createProperty(predicate), model.createResource(object));
     }
 
+    public void addLiteral(String subject, String predicate, String literal) {
+        Resource r = model.createResource(subject);
+        r.addProperty(model.createProperty(predicate), literal);
+    }
+
+    public void addLiteral(String subject, Property predicate, String literal) {
+        Resource r = model.createResource(subject);
+        r.addProperty(predicate, literal);
+    }
+
     public void add(String subject, Property predicate, Resource object) {
         Resource r = model.createResource(subject);
         r.addProperty(predicate, object);

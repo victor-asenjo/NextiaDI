@@ -3,6 +3,7 @@ package edu.upc.essi.dtim.nextiadi.config;
 
 public enum Vocabulary {
 
+
     IntegrationClass(Namespaces.NextiaDI.val() + "IntegrationClass"),
     IntegrationDProperty( Namespaces.NextiaDI.val() + "IntegrationDProperty"),
     IntegrationOProperty( Namespaces.NextiaDI.val() + "IntegrationOProperty");

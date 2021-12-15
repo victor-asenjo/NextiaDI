@@ -1,19 +1,22 @@
 package edu.upc.essi.dtim.nextiadi.config;
 
-public enum Namespaces {
 
-    G("http://www.essi.upc.edu/DTIM/"),
-    NextiaDI("http://www.essi.upc.edu/DTIM/NextiaDI/");
+public enum Formats {
 
+
+    CSV("CSV"),
+    JSON("JSON");
 
     private String element;
 
-    Namespaces(String element) {
+    Formats(String element) {
         this.element = element;
     }
 
     public String val() {
         return element;
     }
+
+
 
 }

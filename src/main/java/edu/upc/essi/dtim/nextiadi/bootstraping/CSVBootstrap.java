@@ -22,13 +22,13 @@ import java.io.*;
  * Generates an RDFS-compliant representation of a CSV file schema
  * @author snadal
  */
-public class CSVBootstrap {
+public class CSVBootstrap extends DataSource{
 
-	Graph Σ;
+//	Graph Σ;
 
 
 	public CSVBootstrap(){
-		Σ = new Graph();
+		super();
 	}
 
 
