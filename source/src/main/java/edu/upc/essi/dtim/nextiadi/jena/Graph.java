@@ -1,10 +1,11 @@
 package edu.upc.essi.dtim.nextiadi.jena;
 
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
+import edu.upc.essi.dtim.nextiadi.exceptions.NoDomainForPropertyException;
+import edu.upc.essi.dtim.nextiadi.exceptions.NoRangeForPropertyException;
 import edu.upc.essi.dtim.nextiadi.models.Alignment;
 import edu.upc.essi.dtim.nextiadi.models.Subject;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
@@ -435,9 +436,12 @@ public class Graph {
 
     }
 
-    public String getSuperRangeFromProperty(String property) {
+    public String getSuperRangeFromProperty(String property) throws NoRangeForPropertyException {
 
         String range = getRange(property);
+        if(range == null){
+            throw new NoRangeForPropertyException("Property "+ property +" does not have a domain");
+        }
 
         String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
                 "SELECT ?superClass WHERE { <"+range+"> rdfs:subClassOf ?superClass.}";
@@ -466,9 +470,12 @@ public class Graph {
     }
 
 
-    public String getSuperDomainFromProperty(String property) {
+    public String getSuperDomainFromProperty(String property) throws NoDomainForPropertyException {
 
         String domain = getDomain(property);
+        if(domain == null){
+            throw new NoDomainForPropertyException("Property "+ property +" does not have a domain");
+        }
 
         String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
                 "SELECT ?superClass WHERE { <"+domain+"> rdfs:subClassOf ?superClass.}";
@@ -489,6 +496,7 @@ public class Graph {
                 "SELECT ?domain WHERE { <"+subject+"> rdfs:domain ?domain.}";
         List<String> result = getVar(query, "domain");
         if(result.isEmpty()){
+
             return null;
         } else {
             return result.get(0);

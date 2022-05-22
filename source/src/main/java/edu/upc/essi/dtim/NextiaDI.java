@@ -1,6 +1,8 @@
 package edu.upc.essi.dtim;
 
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
+import edu.upc.essi.dtim.nextiadi.exceptions.NoDomainForPropertyException;
+import edu.upc.essi.dtim.nextiadi.exceptions.NoRangeForPropertyException;
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
 import edu.upc.essi.dtim.nextiadi.models.Alignment;
 import org.apache.jena.rdf.model.Model;
@@ -102,16 +104,24 @@ public class NextiaDI {
 
         for ( Alignment a: ADP ) {
 
-            String domainA = graphO.getSuperDomainFromProperty(a.getIriA());
-            String domainB = graphO.getSuperDomainFromProperty(a.getIriB());
+            String domainA = null;
+            String domainB = null;
+            try {
+                domainA = graphO.getSuperDomainFromProperty(a.getIriA());
+                domainB = graphO.getSuperDomainFromProperty(a.getIriB());
+            } catch (NoDomainForPropertyException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+
 
             if( graphO.isIntegratedClass(domainA) & domainA.equals(domainB) ) {
 
                 if( graphO.isIntegratedDatatypeProperty(a.getIriA()) & graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
                     graphO.replaceIntegratedProperty(a);
                 } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
-                    graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriB() );
-                } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
+                    graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriA() );
+                } else if ( graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
                     graphO.add(a.getIriA(), RDFS.subPropertyOf.getURI(), a.getIriB() );
                 } else {
                     graphO.add(a.getIriL(), RDF.type.getURI(), Vocabulary.IntegrationDProperty.val());
@@ -139,21 +149,37 @@ public class NextiaDI {
 
         for ( Alignment a: ADP ) {
 
-            String domainA = graphO.getSuperDomainFromProperty(a.getIriA());
-            String domainB = graphO.getSuperDomainFromProperty(a.getIriB());
-            String rangeA = graphO.getSuperRangeFromProperty(a.getIriA());
-            String rangeB = graphO.getSuperRangeFromProperty(a.getIriB());
+            String domainA = null;
+            String domainB = null;
+            try {
+                domainA = graphO.getSuperDomainFromProperty(a.getIriA());
+                domainB = graphO.getSuperDomainFromProperty(a.getIriB());
+            } catch (NoDomainForPropertyException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+            String rangeA = null;
+            String rangeB = null;
+            try{
+                rangeA = graphO.getSuperRangeFromProperty(a.getIriA());
+                rangeB = graphO.getSuperRangeFromProperty(a.getIriB());
+            } catch (NoRangeForPropertyException e){
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+
 
             if( graphO.isIntegratedClass(domainA) & domainA.equals(domainB) & graphO.isIntegratedClass(rangeA) & rangeA.equals(rangeB) ) {
 
                 if( graphO.isIntegratedDatatypeProperty(a.getIriA()) & graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
                     graphO.replaceIntegratedProperty(a);
                 } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
-                    graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriB() );
-                } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
+                    graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriA() );
+                } else if ( graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
                     graphO.add(a.getIriA(), RDFS.subPropertyOf.getURI(), a.getIriB() );
                 } else {
-                    graphO.add(a.getIriL(), RDF.type.getURI(), Vocabulary.IntegrationDProperty.val());
+                    graphO.add(a.getIriL(), RDF.type.getURI(), Vocabulary.IntegrationOProperty.val());
                     graphO.add(a.getIriA(), RDFS.subPropertyOf.getURI(), a.getIriL());
                     graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriL());
 
