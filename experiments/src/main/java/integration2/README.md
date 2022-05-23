@@ -17,8 +17,8 @@ The class IntegrationExp2 uses the following parameters:
 | -n        | false    | Number of datasets to bootstrap. Default is 100. |
 | -r        | false    | Number of repetitions. Default is 1.             |
 
-We present an example of how to run it with java jar command in the following:
+We present an example of how to run it with java cp command in the following:
 
 ```
-java -jar
+java -cp NextiaDI_experiments.jar integration2.IntegrationExp2 -o "/Users/jflores/output/" -d "/Users/jflores/input/"
 ```
