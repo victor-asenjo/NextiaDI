@@ -1,4 +1,4 @@
-# Schema integration experiment 2
+# Schema integration experiment 3
 
 Here, we describe the steps needed to reproduce this experiment. This experiment is coded in IntegrationExp3.java file. This experiment can be executed using the jar and the data sources provided.
 
