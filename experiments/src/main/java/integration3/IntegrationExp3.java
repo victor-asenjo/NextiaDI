@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.sys.JenaSystem;
 import picocli.CommandLine;
 
 import java.io.FileNotFoundException;
@@ -37,9 +38,12 @@ public class IntegrationExp3 {
     @CommandLine.Option(names = "-r", defaultValue = "1", description = "Number of repetitions")
     int repetition;
 
-    public IntegrationExp3(){};
+    public IntegrationExp3(){
+        org.apache.jena.query.ARQ.init();
+    };
     public IntegrationExp3(String directory){
         this.directory = directory;
+        org.apache.jena.query.ARQ.init();
     }
 
     public String getDir(String directory, String fileName){

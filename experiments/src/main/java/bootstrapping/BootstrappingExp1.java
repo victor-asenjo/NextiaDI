@@ -5,6 +5,7 @@ import edu.upc.essi.dtim.nextiadi.bootstraping.CSVBootstrap;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.sys.JenaSystem;
 import picocli.CommandLine;
 
 import java.io.*;
@@ -33,9 +34,12 @@ public class BootstrappingExp1 {
     @CommandLine.Option(names = "-r", defaultValue = "1", description = "Number of repetitions")
     int repetition = 1;
 
-    public BootstrappingExp1(){}
+    public BootstrappingExp1(){
+        org.apache.jena.query.ARQ.init();
+    }
     public BootstrappingExp1(String directory) {
         this.directory = directory;
+        org.apache.jena.query.ARQ.init();
     }
 
     public String getDirForDataSource(String directory ,int iteration, String type){
