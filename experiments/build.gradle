@@ -30,7 +30,7 @@ dependencies {
     implementation 'com.devskiller:jfairy:0.6.4'
 //    implementation group: "edu.upc.essi.dtim", name: "NextiaDI", version: "1.0.1-SNAPSHOT", transitive: true
 
-    implementation 'edu.upc.essi.dtim:nextiadi:0.1.0-SNAPSHOT'
+    implementation 'edu.upc.essi.dtim:nextiadi:0.1.0'
     implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
 
 }
@@ -45,7 +45,7 @@ configurations.all {
 
 task uberJar(type: Jar) {
     archiveClassifier = 'uber'
-
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from sourceSets.main.output
 
     dependsOn configurations.runtimeClasspath
