@@ -8,7 +8,7 @@ plugins {
 //groupID https://docs.gradle.org/current/userguide/publishing_maven.html#sec:identity_values_in_the_generated_pom
 // artifactID taken from project name in settings.gradle file
 group 'edu.upc.essi.dtim'
-version '1.0.1-SNAPSHOT'
+version '0.1.0'
 
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -57,9 +57,34 @@ task uberJar(type: Jar) {
     }
 }
 
+signing {
+    required {
+        // signing is required if this is a release version and the artifacts are to be published
+        !version.toString().endsWith('-SNAPSHOT') && tasks.withType(PublishToMavenRepository).find {
+            gradle.taskGraph.hasTask it
+        }
+    }
+    sign publishing.publications
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            from components.java
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
             pom {
                 name = 'NextiaDI'
                 description = 'Agnostic and Incremental Data Integration that facilitates generating graph-based schema of heterogeneous data sources and integrating them.'
@@ -97,7 +122,6 @@ publishing {
             def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
 
         }
     }
