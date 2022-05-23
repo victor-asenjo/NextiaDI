@@ -20,7 +20,7 @@ The class IntegrationExp3 uses the following parameters:
 We present an example of how to run it with java jar command in the following:
 
 ```
-java -jar
+java -cp NextiaDI_experiments.jar integration3.IntegrationExp3 -o "/Users/jflores/output/" -d "/Users/jflores/input/" 
 ```
 Note that for largeBio will be required to increase entity expansion limit parameter in java due to the large amount of entities contain in dataset largeBio. To this end, add the following VM argument:
 
