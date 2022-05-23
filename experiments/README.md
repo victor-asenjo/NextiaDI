@@ -1,6 +1,6 @@
 # Reproducibility of experiments
 
-Here, you can find the code and instructions to reproduce the experiments to evaluate NextiaDI. We evaluate the main NextiaDI's features: bootstrapping and schema integration to assess their complexity and runtime performance. 
+Here, you can find the code and instructions to reproduce the experiments to evaluate NextiaDI. We evaluate the main NextiaDI's features: bootstrapping and schema integration to assess their complexity and runtime performance. All experiments code are provided in this [JAR](https://mydisk.cs.upc.edu/s/dfKQ35yafqWo577/download) for easy of use.
 
 
 ## Bootstrapping experiment
