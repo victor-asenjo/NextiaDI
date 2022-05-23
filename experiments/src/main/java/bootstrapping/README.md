@@ -21,5 +21,5 @@ The class BootstrappingExp1 uses the following parameters:
 We present an example of how to run it with java jar command in the following:
 
 ```
-java -jar
+java -cp NextiaDI_experiments.jar bootstrapping.BootstrappingExp1 -o "/Users/jflores/output/" -d "/Users/jflores/input/" 
 ```
