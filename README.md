@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  <a href="https://www.essi.upc.edu/dtim/nextiadi/"><img src="https://www.essi.upc.edu/~jflores/public/nextia_logo.png" alt="NextiaJD" width="300">
+  <a href="https://www.essi.upc.edu/dtim/nextiadi/"><img src="https://www.essi.upc.edu/~jflores/public/nextiadi_logo.png" alt="NextiaDI" width="300">
   </a>
 </h1>
 
