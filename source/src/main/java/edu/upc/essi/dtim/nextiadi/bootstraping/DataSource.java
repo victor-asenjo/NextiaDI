@@ -65,4 +65,10 @@ public abstract class DataSource {
         Σ.addLiteral( ds , RDFS.label.getURI(),  name );
     }
 
+    protected String createIRI(String name){
+        if(id.equals("")){
+            return DataSourceVocabulary.Schema.val() + name;
+        }
+        return DataSourceVocabulary.Schema.val() + id+"/"+ name;
+    }
 }

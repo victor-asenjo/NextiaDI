@@ -1,5 +1,7 @@
 package edu.upc.essi.dtim.nextiadi.bootstraping;
 
+import edu.upc.essi.dtim.nextiadi.config.DataSourceVocabulary;
+import edu.upc.essi.dtim.nextiadi.config.Formats;
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -17,6 +19,7 @@ import org.apache.jena.vocabulary.XSD;
 
 import javax.json.*;
 import java.io.*;
+import java.util.stream.Collectors;
 
 /**
  * Generates an RDFS-compliant representation of a CSV file schema
@@ -39,21 +42,47 @@ public class CSVBootstrap extends DataSource{
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
 
-		Σ.add(P, RDF.type, RDFS.Class);
+		Σ.add(createIRI(P), RDF.type, RDFS.Class);
 		parser.getHeaderNames().forEach(h -> {
 			String h2 = h.replace("\"", "").trim();
 //			System.out.println(h2);
-			Σ.add(P+"."+h2,RDF.type,RDF.Property);
-			Σ.add(P+"."+h2,RDFS.domain,P);
-			Σ.add(P+"."+h2,RDFS.range,XSD.xstring);
+			Σ.add(createIRI(P+"."+h2),RDF.type,RDF.Property);
+			Σ.add(createIRI(P+"."+h2),RDFS.domain,createIRI(P));
+			Σ.add(createIRI(P+"."+h2),RDFS.range,XSD.xstring);
+			Σ.addLiteral(createIRI(P+"."+h2), RDFS.label,h2 );
 		});
 
+		String select =  parser.getHeaderNames().stream().map(a ->{ return  a +" AS "+ a.replace(".","_"); }).collect(Collectors.joining(","));
+		wrapper = "SELECT " + select  + " FROM " + namespace;
+		addMetaData(namespace, "", path);
+		Σ.getModel().setNsPrefixes(prefixes);
 		return Σ.getModel();
+	}
+
+	private void addMetaData(String name, String id, String path){
+		String ds = DataSourceVocabulary.DataSource.val() +"/" + name;
+		if (!id.equals("")){
+			ds = DataSourceVocabulary.DataSource.val() +"/" + id;
+			Σ.addLiteral( ds , DataSourceVocabulary.HAS_ID.val(), id);
+		}
+		addBasicMetaData(name, path, ds);
+		Σ.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.CSV.val());
+		Σ.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
 	}
 
 	public void write(String file, String lang){
 		Σ.write(file,lang);
 	}
+
+	public static void main(String[] args) throws IOException {
+
+		String pathcsv = "/Users/javierflores/Documents/datasets/1/artworks.csv";
+		CSVBootstrap csv = new CSVBootstrap();
+		Model m =csv.bootstrapSchema("artworks", pathcsv);
+		m.write(System.out, "Turtle");
+	}
+
+
 //	public static void main(String[] args) throws IOException {
 //		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/cities.csv"));
 //		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());

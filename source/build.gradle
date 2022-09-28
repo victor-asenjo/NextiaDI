@@ -8,7 +8,8 @@ plugins {
 //groupID https://docs.gradle.org/current/userguide/publishing_maven.html#sec:identity_values_in_the_generated_pom
 // artifactID taken from project name in settings.gradle file
 group 'edu.upc.essi.dtim'
-version '0.1.0'
+//version '0.1.0'
+version '0.1.0-SNAPSHOT'
 
 sourceCompatibility = 11
 targetCompatibility = 11

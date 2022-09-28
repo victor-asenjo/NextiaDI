@@ -24,7 +24,6 @@ public class NextiaDI {
        reset();
     }
 
-
     public void reset(){
 
         graphO  = new Graph();

@@ -208,12 +208,7 @@ public class JSONBootstrap extends DataSource{
 		lateralViews.add(Pair.of(removeSeqs(P+"."+key),generateArrayAlias(P+"."+key)));
 	}
 
-	private String createIRI(String name){
-		if(id.equals("")){
-			return DataSourceVocabulary.Schema.val() + name;
-		}
-		return DataSourceVocabulary.Schema.val() + id+"/"+ name;
-	}
+
 	private void LiteralString (JsonString φ,  String P, String implP) {
 		Σ.add(createIRI(P),RDFS.range,XSD.xstring);
 		attributes.add(Pair.of(P,implP));
@@ -242,7 +237,6 @@ public class JSONBootstrap extends DataSource{
 		addBasicMetaData(name, path, ds);
 		Σ.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.JSON.val());
 		Σ.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
-
 	}
 
 
