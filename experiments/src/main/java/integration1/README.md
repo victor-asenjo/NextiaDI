@@ -4,7 +4,7 @@ Here, we describe the steps needed to reproduce this experiment. This experiment
 
 ## Jar
 
-The jar for all experiments is the same. In case you have not download it. You can find it [here]().
+The jar for all experiments is the same. In case you have not download it. You can find it [here](https://mydisk.cs.upc.edu/s/dfKQ35yafqWo577).
 
 ## Parameters
 
@@ -20,5 +20,5 @@ The class IntegrationExp1 uses the following parameters:
 We present an example of how to run it with java jar command in the following:
 
 ```
-java -jar
+ java -cp NextiaDI_experiments.jar integration1.IntegrationExp1 -o "/Users/jflores/output/" -d "/Users/jflores/input/"
 ```
