@@ -35,7 +35,7 @@ public class CSVBootstrap extends DataSource{
 	}
 
 
-	public Model bootstrapSchema(String name, String namespace, String path) throws IOException {
+	public Model bootstrapSchema(String id, String name, String namespace, String path) throws IOException {
 		Σ = new Graph();
 		String P = namespace;
 
@@ -54,7 +54,7 @@ public class CSVBootstrap extends DataSource{
 
 		String select =  parser.getHeaderNames().stream().map(a ->{ return  a +" AS "+ a.replace(".","_"); }).collect(Collectors.joining(","));
 		wrapper = "SELECT " + select  + " FROM " + namespace;
-		addMetaData(name, "", path);
+		addMetaData( name, id, path);
 		Σ.getModel().setNsPrefixes(prefixes);
 		return Σ.getModel();
 	}
@@ -78,7 +78,7 @@ public class CSVBootstrap extends DataSource{
 
 		String pathcsv = "/Users/javierflores/Documents/datasets/1/artworks.csv";
 		CSVBootstrap csv = new CSVBootstrap();
-		Model m =csv.bootstrapSchema("artworks","d", pathcsv);
+		Model m =csv.bootstrapSchema("","artworks","d", pathcsv);
 		m.write(System.out, "Turtle");
 	}
 

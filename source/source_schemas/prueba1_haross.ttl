@@ -1,0 +1,132 @@
+@prefix nextiaDataSource: <http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/> .
+@prefix nextiaSchema:     <http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/> .
+@prefix rdf:              <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:             <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:              <http://www.w3.org/2001/XMLSchema#> .
+
+nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors.name
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors ;
+        rdfs:label              "name" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_contributors_name" .
+
+nextiaSchema:prueba1  rdf:type  rdfs:Class ;
+        rdfs:label  "prueba1" .
+
+nextiaSchema:prueba1.Seq1.artworks.Seq2
+        rdf:type    rdf:Seq ;
+        rdfs:label  "Seq2" .
+
+nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors.birthYear
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors ;
+        rdfs:label              "birthYear" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_contributors_birthYear" .
+
+nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors
+        rdf:type    rdfs:Class ;
+        rdfs:label  "contributors" .
+
+nextiaDataSource:359835e0cff94c5da6886eac2bb05992
+        rdf:type                       <http://www.essi.upc.edu/DTIM/NextiaDI/DataSource> ;
+        rdfs:label                     "prueba1" ;
+        nextiaDataSource:description   "" ;
+        nextiaDataSource:format        "JSON" ;
+        nextiaDataSource:graphicalGraph
+                "{\"nodes\":[{\"id\":\"Class1\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.title\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"title\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link1\"},{\"id\":\"Class2\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.ContainerMembershipProperty2\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty\",\"type\":\"objectProperty\",\"label\":\"ContainerMembershipProperty2\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2\",\"range\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors\",\"linkId\":\"Link2\"},{\"id\":\"Class3\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors.gender\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"gender\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link3\"},{\"id\":\"Class4\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#Class\",\"type\":\"class\",\"label\":\"artworks\"},{\"id\":\"Class5\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.acquisitionYear\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"acquisitionYear\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link4\"},{\"id\":\"Class6\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.has_artworks\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"has_artworks\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1\",\"range\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1\",\"linkId\":\"Link5\"},{\"id\":\"Class7\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.ContainerMembershipProperty1\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty\",\"type\":\"objectProperty\",\"label\":\"ContainerMembershipProperty1\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1\",\"range\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"linkId\":\"Link6\"},{\"id\":\"Class8\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#Class\",\"type\":\"class\",\"label\":\"contributors\"},{\"id\":\"Class9\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors.role\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"role\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link7\"},{\"id\":\"Class10\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.url\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"url\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link8\"},{\"id\":\"Class11\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors.name\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"name\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link9\"},{\"id\":\"Class12\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.has_contributors\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"has_contributors\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"range\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2\",\"linkId\":\"Link10\"},{\"id\":\"Class13\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq\",\"type\":\"class\",\"label\":\"Seq1\"},{\"id\":\"Class14\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors.birthYear\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"birthYear\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2.contributors\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link11\"},{\"id\":\"Class15\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.classification\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"classification\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link12\"},{\"id\":\"Class16\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.museumName\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"museumName\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link13\"},{\"id\":\"Class18\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.medium\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"datatypeProperty\",\"label\":\"medium\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link14\"},{\"id\":\"Class19\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#Class\",\"type\":\"class\",\"label\":\"prueba1\"},{\"id\":\"Class20\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1.Seq1.artworks.Seq2\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq\",\"type\":\"class\",\"label\":\"Seq2\"},{\"id\":\"Datatype21\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype22\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype23\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype24\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype25\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype26\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype27\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype28\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype29\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype30\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"}],\"links\":[{\"id\":\"Link1\",\"source\":\"Class4\",\"target\":\"Datatype21\",\"label\":\"title\"},{\"id\":\"Link2\",\"source\":\"Class20\",\"target\":\"Class8\",\"label\":\"ContainerMembershipProperty2\"},{\"id\":\"Link3\",\"source\":\"Class8\",\"target\":\"Datatype22\",\"label\":\"gender\"},{\"id\":\"Link4\",\"source\":\"Class4\",\"target\":\"Datatype23\",\"label\":\"acquisitionYear\"},{\"id\":\"Link5\",\"source\":\"Class19\",\"target\":\"Class13\",\"label\":\"has_artworks\"},{\"id\":\"Link6\",\"source\":\"Class13\",\"target\":\"Class4\",\"label\":\"ContainerMembershipProperty1\"},{\"id\":\"Link7\",\"source\":\"Class8\",\"target\":\"Datatype24\",\"label\":\"role\"},{\"id\":\"Link8\",\"source\":\"Class4\",\"target\":\"Datatype25\",\"label\":\"url\"},{\"id\":\"Link9\",\"source\":\"Class8\",\"target\":\"Datatype26\",\"label\":\"name\"},{\"id\":\"Link10\",\"source\":\"Class4\",\"target\":\"Class20\",\"label\":\"has_contributors\"},{\"id\":\"Link11\",\"source\":\"Class8\",\"target\":\"Datatype27\",\"label\":\"birthYear\"},{\"id\":\"Link12\",\"source\":\"Class4\",\"target\":\"Datatype28\",\"label\":\"classification\"},{\"id\":\"Link13\",\"source\":\"Class19\",\"target\":\"Datatype29\",\"label\":\"museumName\"},{\"id\":\"Link14\",\"source\":\"Class4\",\"target\":\"Datatype30\",\"label\":\"medium\"}]}" ;
+        nextiaDataSource:hasFileName   "xfSgb9R24HDiVExf_Tate_collection.json" ;
+        nextiaDataSource:hasFileSize   "5062bytes" ;
+        nextiaDataSource:hasProjectID  "93e0f6e4f551406fa0a118be08a79c55" ;
+        nextiaDataSource:id            "359835e0cff94c5da6886eac2bb05992" ;
+        nextiaDataSource:path          "/Users/javierflores/Documents/upc/projects/newODIN/api/landing_zone/temporal/ds/xfSgb9R24HDiVExf_Tate_collection.json" ;
+        nextiaDataSource:wrapper       "SELECT prueba1.museumName,prueba1_artworks.acquisitionYear AS prueba1_artworks_acquisitionYear,prueba1_artworks_contributors.name AS prueba1_artworks_contributors_name,prueba1_artworks_contributors.gender AS prueba1_artworks_contributors_gender,prueba1_artworks_contributors.birthYear AS prueba1_artworks_contributors_birthYear,prueba1_artworks_contributors.role AS prueba1_artworks_contributors_role,prueba1_artworks.classification AS prueba1_artworks_classification,prueba1_artworks.medium AS prueba1_artworks_medium,prueba1_artworks.title AS prueba1_artworks_title,prueba1_artworks.url AS prueba1_artworks_url FROM prueba1 LATERAL VIEW explode(prueba1.artworks.contributors) AS prueba1_artworks_contributors\nLATERAL VIEW explode(prueba1.artworks) AS prueba1_artworks" .
+
+nextiaSchema:prueba1.Seq1.artworks.Seq2.ContainerMembershipProperty2
+        rdf:type     rdfs:ContainerMembershipProperty ;
+        rdfs:domain  nextiaSchema:prueba1.Seq1.artworks.Seq2 ;
+        rdfs:label   "ContainerMembershipProperty2" ;
+        rdfs:range   nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors .
+
+nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors.gender
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors ;
+        rdfs:label              "gender" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_contributors_gender" .
+
+nextiaSchema:prueba1.Seq1.artworks.title
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks ;
+        rdfs:label              "title" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_title" .
+
+nextiaSchema:prueba1.Seq1.artworks.url
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks ;
+        rdfs:label              "url" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_url" .
+
+nextiaSchema:prueba1.Seq1.artworks.acquisitionYear
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks ;
+        rdfs:label              "acquisitionYear" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_acquisitionYear" .
+
+nextiaSchema:prueba1.Seq1.artworks
+        rdf:type    rdfs:Class ;
+        rdfs:label  "artworks" .
+
+nextiaSchema:prueba1.Seq1.artworks.has_contributors
+        rdf:type     rdf:Property ;
+        rdfs:domain  nextiaSchema:prueba1.Seq1.artworks ;
+        rdfs:label   "has_contributors" ;
+        rdfs:range   nextiaSchema:prueba1.Seq1.artworks.Seq2 .
+
+nextiaSchema:prueba1.museumName
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1 ;
+        rdfs:label              "museumName" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1.museumName" .
+
+nextiaSchema:prueba1.Seq1.artworks.classification
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks ;
+        rdfs:label              "classification" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_classification" .
+
+nextiaSchema:prueba1.Seq1.ContainerMembershipProperty1
+        rdf:type     rdfs:ContainerMembershipProperty ;
+        rdfs:domain  nextiaSchema:prueba1.Seq1 ;
+        rdfs:label   "ContainerMembershipProperty1" ;
+        rdfs:range   nextiaSchema:prueba1.Seq1.artworks .
+
+nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors.role
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks.Seq2.contributors ;
+        rdfs:label              "role" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_contributors_role" .
+
+nextiaSchema:prueba1.has_artworks
+        rdf:type     rdf:Property ;
+        rdfs:domain  nextiaSchema:prueba1 ;
+        rdfs:label   "has_artworks" ;
+        rdfs:range   nextiaSchema:prueba1.Seq1 .
+
+nextiaSchema:prueba1.Seq1.artworks.medium
+        rdf:type                rdf:Property ;
+        rdfs:domain             nextiaSchema:prueba1.Seq1.artworks ;
+        rdfs:label              "medium" ;
+        rdfs:range              xsd:string ;
+        nextiaDataSource:alias  "prueba1_artworks_medium" .
+
+nextiaSchema:prueba1.Seq1
+        rdf:type    rdf:Seq ;
+        rdfs:label  "Seq1" .

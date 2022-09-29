@@ -316,26 +316,26 @@ public class Graph {
         ResultSet result = runAQuery(query);
     }
 
-//    public void minimalIDProperties(){
-//
-//        String queryD = "PREFIX rdfs: <"+RDFS.getURI()+">" +
-//                "PREFIX rdf: <"+RDF.getURI()+">" +
-//                "DELETE {" +
-//                " ?s rdfs:subPropertyOf ?integratedD. " +
-//                "?s rdfs:domain ?domain." +
-//                "?s rdfS:range ?range." +
-//                "?s rdf:type ?type." +
-//                "} " +
-//                "INSERT {} WHERE { " +
-//                " ?integratedD rdf:type <"+Vocabulary.IntegrationDProperty+">." +
-//                " ?s rdfs:subPropertyOf ?integratedD."  +
-//                " ?s rdfs:domain ?domain." +
-//                " ?s rdfs:range ?range." +
-//                " ?s rdf:type ?type." +
-//                " }";
-//        runAnUpdateQuery(queryD);
-//
-//    }
+    public void minimalIDProperties(){
+
+        String queryD = "PREFIX rdfs: <"+RDFS.getURI()+">" +
+                "PREFIX rdf: <"+RDF.getURI()+">" +
+                "DELETE {" +
+                " ?s rdfs:subPropertyOf ?integratedD. " +
+                "?s rdfs:domain ?domain." +
+                "?s rdfS:range ?range." +
+                "?s rdf:type ?type." +
+                "} " +
+                "INSERT {} WHERE { " +
+                " ?integratedD rdf:type <"+Vocabulary.IntegrationDProperty+">." +
+                " ?s rdfs:subPropertyOf ?integratedD."  +
+                " ?s rdfs:domain ?domain." +
+                " ?s rdfs:range ?range." +
+                " ?s rdf:type ?type." +
+                " }";
+        runAnUpdateQuery(queryD);
+
+    }
 
     public void minimalIOProperties(){
 
@@ -396,8 +396,10 @@ public class Graph {
                 " ?dataProperty rdfs:range ?range. " +
                 "} WHERE {" +
                 " ?integratedC rdf:type <"+Vocabulary.IntegrationClass.val()+">.  " +
-                " ?s ?dr ?integratedC. " + // retrieves properties with domain and range...
+                " OPTIONAL { ?s ?dr ?integratedC. " + // retrieves properties with domain and range... It's optional since user could only integrate classes
                 " ?s rdf:type ?typeS. " +
+                " FILTER (?dr = rdfs:domain || ?dr = rdfs:range )" +
+                "}" +
                 " OPTIONAL{ " +
                 "   ?s rdfs:range ?rangeS  " + // for data types
                 " }" +
@@ -409,16 +411,102 @@ public class Graph {
                 "   ?dataProperty rdf:type ?dataPropertyType. " +
                 "}  " +
                 " FILTER NOT EXISTS {?dataProperty rdfs:subPropertyOf ?sub. ?sub rdf:type <"+Vocabulary.IntegrationDProperty.val()+">}" +
-                " FILTER (?dr = rdfs:domain || ?dr = rdfs:range )" +
+
                 "}  ";
+
 
 
         Query query = QueryFactory.create(querySTR);
         QueryExecution qexec = QueryExecutionFactory.create(query, model);
         Model results = qexec.execConstruct();
         return results;
+        //        String querySTR = "PREFIX rdfs: <"+RDFS.getURI()+">" +
+//                "PREFIX rdf: <"+RDF.getURI()+">" +
+//                "CONSTRUCT {" +
+//                " ?integratedC rdf:type <"+Vocabulary.IntegrationClass.val()+">.  " +
+//                " ?s ?dr ?integratedC. " +  // represent domain and range of integrated properties
+//                " ?s rdf:type ?typeS. " +
+//                " ?s rdfs:range ?rangeS. " +
+//                " ?dataProperty rdfs:domain ?integratedC." +
+//                " ?dataProperty rdf:type ?dataPropertyType."+
+//                " ?dataProperty rdfs:range ?range. " +
+//                "} WHERE {" +
+//                " ?integratedC rdf:type <"+Vocabulary.IntegrationClass.val()+">.  " +
+//                " ?s ?dr ?integratedC. " + // retrieves properties with domain and range...
+//                " ?s rdf:type ?typeS. " +
+//                " OPTIONAL{ " +
+//                "   ?s rdfs:range ?rangeS  " + // for data types
+//                " }" +
+//                " ?subclass rdfs:subClassOf ?integratedC. " +
+//                " ?subclass rdf:type ?type." +
+//                " OPTIONAL { " +
+//                "   ?dataProperty rdfs:domain ?subclass." +
+//                "   ?dataProperty rdfs:range ?range.  " +
+//                "   ?dataProperty rdf:type ?dataPropertyType. " +
+//                "}  " +
+//                " FILTER NOT EXISTS {?dataProperty rdfs:subPropertyOf ?sub. ?sub rdf:type <"+Vocabulary.IntegrationDProperty.val()+">}" +
+//                " FILTER (?dr = rdfs:domain || ?dr = rdfs:range )" +
+//                "}  ";
+
     }
 
+
+    public void minimalOverClasses() {
+
+        // find integrated classes with their subclass
+        String intC = "PREFIX rdfs: <"+RDFS.getURI()+">" +
+                "PREFIX rdf: <"+RDF.getURI()+">" +
+                "SELECT * WHERE {" +
+                " ?integratedC rdf:type <"+Vocabulary.IntegrationClass.val()+">.  " +
+                " ?subclass rdfs:subClassOf ?integratedC. " +
+                "}  ";
+
+
+        ResultSet results = runAQuery(intC);
+        List<String> rows = new ArrayList<>();
+        while(results.hasNext()) {
+            QuerySolution solution = results.nextSolution();
+
+            String oldIRI = solution.getResource("subclass").getURI();
+            String newIRI = solution.getResource("integratedC").getURI();
+            // replace triples pointing to subclass with integrated
+            runAnUpdateQuery("DELETE {?s ?p <"+oldIRI+">} " +
+                    "INSERT {?s ?p <"+newIRI+">} WHERE {  ?s ?p <"+oldIRI+"> }");
+
+            // delete triples where subject is subclass
+            deleteSubject(oldIRI);
+
+        }
+
+    }
+
+    public void minimalOverDataProperties() {
+
+        // find integrated classes with their subclass
+        String intDP = "PREFIX rdfs: <"+RDFS.getURI()+">" +
+                "PREFIX rdf: <"+RDF.getURI()+">" +
+                "SELECT * WHERE {" +
+                " ?integratedProperty rdf:type <"+Vocabulary.IntegrationDProperty.val()+">.  " +
+                " ?subproperty rdfs:subPropertyOf ?integratedProperty. " +
+                "}  ";
+
+
+        ResultSet results = runAQuery(intDP);
+        while(results.hasNext()) {
+            QuerySolution solution = results.nextSolution();
+
+            String oldIRI = solution.getResource("subproperty").getURI();
+            String newIRI = solution.getResource("integratedProperty").getURI();
+            // replace triples pointing to subclass with integrated
+            runAnUpdateQuery("DELETE {?s ?p <"+oldIRI+">} " +
+                    "INSERT {?s ?p <"+newIRI+">} WHERE {  ?s ?p <"+oldIRI+"> }");
+
+            // delete triples where subject is subclass
+            deleteSubject(oldIRI);
+
+        }
+
+    }
 
 
 

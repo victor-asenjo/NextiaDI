@@ -6,10 +6,13 @@ import edu.upc.essi.dtim.nextiadi.exceptions.NoRangeForPropertyException;
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
 import edu.upc.essi.dtim.nextiadi.models.Alignment;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -199,24 +202,43 @@ public class NextiaDI {
         return graphO.generateOnlyIntegrations();
     }
 
+    public Model getOldMinimalGraph(){
+        Graph minimalG = new Graph();
+
+        minimalG.setModel(graphO.getModel());
+        minimalG.minimalIDProperties();
+        minimalG.minimalIOProperties();
+        minimalG.minimalClasses();
+
+
+
+        return minimalG.getModel();
+    }
+
     public Model getMinimalGraph(){
         Graph minimalG = new Graph();
 
         minimalG.setModel(graphO.getModel());
 
-        minimalG.test();
-//        minimalG.minimalIDProperties();
-//        minimalG.minimalIOProperties();
-//        minimalG.minimalClasses();
-//        minimalG.removeMetaModel();
-
-        return minimalG.minimalClassesConstruct();
-
-
-
-//        graphO2.setModel(graphO.getModel());
+//        minimalG.test();
+//
+//        return minimalG.minimalClassesConstruct();
+//
+        minimalG.minimalOverClasses();
+        minimalG.minimalOverDataProperties();
+        return minimalG.getModel();
 
 
+    }
+
+    public Model getMinimalGraph2(){
+        Graph minimalG = new Graph();
+
+        minimalG.setModel(graphO.getModel());
+//
+        minimalG.minimalOverClasses();
+        minimalG.minimalOverDataProperties();
+        return minimalG.getModel();
 
 
     }
@@ -236,6 +258,33 @@ public class NextiaDI {
 
 
     public static void main(String[] args) throws FileNotFoundException {
+
+        NextiaDI n = new NextiaDI();
+
+        Model graphA = RDFDataMgr.loadModel("/Users/javierflores/Documents/upc/projects/NextiaDI/source/source_schemas/prueba1_haross.ttl") ;
+        Model graphB = RDFDataMgr.loadModel("/Users/javierflores/Documents/upc/projects/NextiaDI/source/source_schemas/prueba2_haross.ttl") ;
+
+        List<Alignment> al = new ArrayList<>();
+        Alignment a = new Alignment();
+        a.setType("class");
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/359835e0cff94c5da6886eac2bb05992/prueba1");
+        a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/dbae6a8d27214912aaa7068d8008f321/prueba2");
+        a.setL("IT_PRUEBA");
+        al.add(a);
+//        a.setIdentifier(true);
+
+        Model integratedModel = n.Integrate(graphA, graphB, al);
+        Model minimal = n.getMinimalGraph();
+
+        try {
+            RDFDataMgr.write(new FileOutputStream("/Users/javierflores/Documents/upc/projects/NextiaDI/source/source_schemas/minimal.ttl"), minimal, Lang.TURTLE);
+            System.out.println("file written temporal");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+
 //
 //        IntegrationClass in = new IntegrationClass();
 //        Class<?> proxy = in.getClass();
