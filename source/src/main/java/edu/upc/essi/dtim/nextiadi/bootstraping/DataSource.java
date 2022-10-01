@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.nextiadi.bootstraping;
 
+import edu.upc.essi.dtim.nextiadi.bootstraping.metamodels.JSON_MM;
 import edu.upc.essi.dtim.nextiadi.config.DataSourceVocabulary;
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public abstract class DataSource {
         prefixes.put("rdf", RDF.getURI());
         prefixes.put("rdfs", RDFS.getURI());
         prefixes.put("xsd", XSD.getURI());
+        prefixes.put("json", JSON_MM.getURI());
     }
 
     protected void setPrefixesID(String id){

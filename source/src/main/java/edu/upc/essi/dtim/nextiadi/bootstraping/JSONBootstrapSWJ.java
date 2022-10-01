@@ -63,11 +63,13 @@ public class JSONBootstrapSWJ extends DataSource{
 		id = dataSourceID;
 		Document(path,dataSourceName);
 		G_source.getModel().setNsPrefixes(prefixes);
+//		G_source.write("/Users/javierflores/Documents/upc/projects/NextiaDI/source/source_schemas/source.ttl"  , Lang.TURTLE);
+
 		addMetaData(dataSourceName, dataSourceID, path);
 
 		productionRules_JSON_to_RDFS();
 
-		return G_target.getModel();
+		return G_target.getModel().setNsPrefixes(prefixes);
 	}
 
 	/**
@@ -136,12 +138,13 @@ public class JSONBootstrapSWJ extends DataSource{
 		String u_prime = freshArray();
 		G_source.add(createIRI(u_prime),RDF.type,JSON_MM.Array);
 		if (D.size() > 0) {
-			DataType(D.get(0),u_prime);
+			DataType(D.get(0),p);
 		} else {
 			// TODO: some ds have empty array, check below example images array
 			G_source.add(createIRI(p),JSON_MM.hasValue,JSON_MM.String);
 		}
-		G_source.add(createIRI(p),JSON_MM.hasMember,createIRI(u_prime));
+//		G_source.add(createIRI(p),JSON_MM.hasMember,createIRI(u_prime));
+		G_source.add(createIRI(u_prime),JSON_MM.hasMember,createIRI(p));
 	}
 
 	private void Primitive (JsonValue D, String p) {
@@ -208,11 +211,11 @@ public class JSONBootstrapSWJ extends DataSource{
 		//Rule 4. The rdfs:range of an instance of J:Primitive is its corresponding counterpart in the xsd vocabulary. Below we
 		//show the case for instances of J:String whose counterpart is xsd:string . The procedure for instances of J:Number and
 		//J:Boolean is similar using their pertaining type.
-		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> ?v . ?v <"+RDF.type+"> <"+JSON_MM.String+"> }").forEachRemaining(res -> {
+		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> <"+JSON_MM.String+"> }").forEachRemaining(res -> {
 			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property);
 			G_target.add(res.getResource("k").getURI(),RDFS.range,XSD.xstring);
 		});
-		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> ?v . ?v <"+RDF.type+"> <"+JSON_MM.Number+"> }").forEachRemaining(res -> {
+		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> <"+JSON_MM.Number+"> }").forEachRemaining(res -> {
 			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property);
 			G_target.add(res.getResource("k").getURI(),RDFS.range,XSD.xint);
 		});
@@ -253,7 +256,7 @@ public class JSONBootstrapSWJ extends DataSource{
 		JSONBootstrapSWJ j = new JSONBootstrapSWJ();
 		String D = "cmoa_sample.json";
 
-		Model M = j.bootstrapSchema("src/main/resources/cmoa_sample.json", D,"src/main/resources/cmoa_sample.json");
+		Model M = j.bootstrapSchema("cmoa_data", D,"src/main/resources/cmoa_sample.json");
 
 		Graph G = new Graph();
 		G.setModel(M);
