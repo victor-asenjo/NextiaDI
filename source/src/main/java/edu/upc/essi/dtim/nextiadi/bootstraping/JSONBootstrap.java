@@ -180,6 +180,11 @@ public class JSONBootstrap extends DataSource{
 				Σ.addLiteral(createIRI(u), RDFS.label,labelSeq );
 				Σ.add( createIRI(P + ".has_" + k), RDFS.range, createIRI(u));
 				Array((JsonArray) v, u, k, k);
+			} else if ( v.getValueType() == JsonValue.ValueType.NULL ) {
+				// I added v.getValueType() == JsonValue.ValueType.NULL because of this data https://github.com/cmoa/collection/blob/master/cmoa/00078d13-d7c7-4f1b-bbe2-b9afcc25fcbd.json
+				label = k;
+				property = P + "." +k;
+				LiteralString( property, implP+"."+k);
 			}
 
 			Σ.add(createIRI(property), RDF.type, RDF.Property);
@@ -197,17 +202,30 @@ public class JSONBootstrap extends DataSource{
 		Σ.add(uuIRI, RDF.type, RDFS.ContainerMembershipProperty);
 		Σ.addLiteral(uuIRI, RDFS.label, label);
 		Σ.add(uuIRI, RDFS.domain, createIRI(P));
-		JsonValue v = φ.get(0);
-		if (v.getValueType() == JsonValue.ValueType.STRING || v.getValueType() == JsonValue.ValueType.NUMBER) {
-			Value(φ.get(0), uu, generateArrayAlias(P+"."+key));
-		} else if (v.getValueType() == JsonValue.ValueType.OBJECT) {
-			String u = key; ObjectCounter++;
-			Σ.add( uuIRI, RDFS.range, createIRI(P + "." + u) );
-			Value(φ.get(0), P + "." + u, generateArrayAlias(P+"."+key));
+		// TODO: some ds have empty array, check below example images array
+//		https://github.com/cmoa/collection/blob/master/cmoa/00078d13-d7c7-4f1b-bbe2-b9afcc25fcbd.json
+		if(φ.size() > 0) {
+			JsonValue v = φ.get(0);
+			if (v.getValueType() == JsonValue.ValueType.STRING || v.getValueType() == JsonValue.ValueType.NUMBER) {
+				Value(φ.get(0), uu, generateArrayAlias(P+"."+key));
+			} else if (v.getValueType() == JsonValue.ValueType.OBJECT) {
+				String u = key; ObjectCounter++;
+				Σ.add( uuIRI, RDFS.range, createIRI(P + "." + u) );
+				Value(φ.get(0), P + "." + u, generateArrayAlias(P+"."+key));
+			}
+			lateralViews.add(Pair.of(removeSeqs(P+"."+key),generateArrayAlias(P+"."+key)));
+		} else {
+			// we assume arrays of strings
+			LiteralString(uu, generateArrayAlias(P+"."+key));
+			lateralViews.add(Pair.of(removeSeqs(P+"."+key),generateArrayAlias(P+"."+key)));
 		}
-		lateralViews.add(Pair.of(removeSeqs(P+"."+key),generateArrayAlias(P+"."+key)));
+
 	}
 
+	private void LiteralString ( String P, String implP) {
+		Σ.add(createIRI(P),RDFS.range,XSD.xstring);
+		attributes.add(Pair.of(P,implP));
+	}
 
 	private void LiteralString (JsonString φ,  String P, String implP) {
 		Σ.add(createIRI(P),RDFS.range,XSD.xstring);
