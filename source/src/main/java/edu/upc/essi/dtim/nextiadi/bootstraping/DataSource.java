@@ -20,7 +20,8 @@ import java.util.Map;
 @Setter
 public abstract class DataSource {
 
-    protected Graph Σ;
+    protected Graph G_source; //used for the graph in the source metamodel
+    protected Graph G_target; //used for the RDFS graph
 
     protected String wrapper;
     //List of pairs, where left is the IRI in the graph and right is the attribute in the wrapper (this will create sameAs edges)
@@ -49,7 +50,9 @@ public abstract class DataSource {
     }
 
     protected void init(){
-        Σ = new Graph();
+        G_source = new Graph();
+        G_target = new Graph();
+
         prefixes = new HashMap<>();
         setPrefixes();
         sourceAttributes = Lists.newArrayList();
@@ -60,9 +63,13 @@ public abstract class DataSource {
     }
 
     public void addBasicMetaData(String name, String path, String ds){
-        Σ.add( ds , RDF.type.getURI(),  DataSourceVocabulary.DataSource.val() );
-        Σ.addLiteral( ds , DataSourceVocabulary.HAS_PATH.val(), path);
-        Σ.addLiteral( ds , RDFS.label.getURI(),  name );
+        G_source.add( ds , RDF.type.getURI(),  DataSourceVocabulary.DataSource.val() );
+        G_source.addLiteral( ds , DataSourceVocabulary.HAS_PATH.val(), path);
+        G_source.addLiteral( ds , RDFS.label.getURI(),  name );
+
+        G_target.add( ds , RDF.type.getURI(),  DataSourceVocabulary.DataSource.val() );
+        G_target.addLiteral( ds , DataSourceVocabulary.HAS_PATH.val(), path);
+        G_target.addLiteral( ds , RDFS.label.getURI(),  name );
     }
 
     protected String createIRI(String name){

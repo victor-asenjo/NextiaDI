@@ -36,42 +36,42 @@ public class CSVBootstrap extends DataSource{
 
 
 	public Model bootstrapSchema(String id, String name, String namespace, String path) throws IOException {
-		Σ = new Graph();
+		G_source = new Graph();
 		String P = namespace;
 
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
 
-		Σ.add(createIRI(P), RDF.type, RDFS.Class);
+		G_source.add(createIRI(P), RDF.type, RDFS.Class);
 		parser.getHeaderNames().forEach(h -> {
 			String h2 = h.replace("\"", "").trim();
 //			System.out.println(h2);
-			Σ.add(createIRI(P+"."+h2),RDF.type,RDF.Property);
-			Σ.add(createIRI(P+"."+h2),RDFS.domain,createIRI(P));
-			Σ.add(createIRI(P+"."+h2),RDFS.range,XSD.xstring);
-			Σ.addLiteral(createIRI(P+"."+h2), RDFS.label,h2 );
+			G_source.add(createIRI(P+"."+h2),RDF.type,RDF.Property);
+			G_source.add(createIRI(P+"."+h2),RDFS.domain,createIRI(P));
+			G_source.add(createIRI(P+"."+h2),RDFS.range,XSD.xstring);
+			G_source.addLiteral(createIRI(P+"."+h2), RDFS.label,h2 );
 		});
 
 		String select =  parser.getHeaderNames().stream().map(a ->{ return  a +" AS "+ a.replace(".","_"); }).collect(Collectors.joining(","));
 		wrapper = "SELECT " + select  + " FROM " + namespace;
 		addMetaData( name, id, path);
-		Σ.getModel().setNsPrefixes(prefixes);
-		return Σ.getModel();
+		G_source.getModel().setNsPrefixes(prefixes);
+		return G_source.getModel();
 	}
 
 	private void addMetaData(String name, String id, String path){
 		String ds = DataSourceVocabulary.DataSource.val() +"/" + name;
 		if (!id.equals("")){
 			ds = DataSourceVocabulary.DataSource.val() +"/" + id;
-			Σ.addLiteral( ds , DataSourceVocabulary.HAS_ID.val(), id);
+			G_source.addLiteral( ds , DataSourceVocabulary.HAS_ID.val(), id);
 		}
 		addBasicMetaData(name, path, ds);
-		Σ.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.CSV.val());
-		Σ.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
+		G_source.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.CSV.val());
+		G_source.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
 	}
 
 	public void write(String file, String lang){
-		Σ.write(file,lang);
+		G_source.write(file,lang);
 	}
 
 	public static void main(String[] args) throws IOException {

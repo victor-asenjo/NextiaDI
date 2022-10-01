@@ -37,7 +37,7 @@ public class JSONBootstrap extends DataSource{
 	private int SeqCounter = 1;
 	private int CMPCounter = 1;
 
-//	private Graph Σ;
+//	private Graph G_source;
 //	//SparkSQL query to get a 1NF view of the file
 //	private String wrapper;
 //	//List of pairs, where left is the IRI in the graph and right is the attribute in the wrapper (this will create sameAs edges)
@@ -65,7 +65,7 @@ public class JSONBootstrap extends DataSource{
 		id = dataSourceID;
 		bootstrap(dataSourceName, path).setNsPrefixes(prefixes);
 		addMetaData(dataSourceName, dataSourceID, path);
-		return Σ.getModel();
+		return G_source.getModel();
 
 	}
 
@@ -73,7 +73,7 @@ public class JSONBootstrap extends DataSource{
 		reset();
 		bootstrap(dataSourceName, path).setNsPrefixes(prefixes);
 		addMetaData(dataSourceName, "", path);
-		return Σ.getModel();
+		return G_source.getModel();
 	}
 
 	public Model bootstrapSchema(String iri, InputStream fis) throws FileNotFoundException {
@@ -81,7 +81,7 @@ public class JSONBootstrap extends DataSource{
 		JsonValue φ = Json.createReader(fis).readValue();
 
 		Value(φ,iri,iri);
-		return Σ.getModel();
+		return G_source.getModel();
 	}
 
 	private Model bootstrap(String D, String path) throws FileNotFoundException {
@@ -107,13 +107,13 @@ public class JSONBootstrap extends DataSource{
 		});
 
 //		Stream.concat(sourceAttributes.stream(), lateralViews.stream()) .forEach(p -> {
-//			Σ.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
+//			G_source.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
 //		});
 		sourceAttributes.forEach(p -> {
-			Σ.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
+			G_source.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
 		});
 
-		return Σ.getModel();
+		return G_source.getModel();
 	}
 
 	private String generateArrayAlias(String a) {
@@ -127,17 +127,17 @@ public class JSONBootstrap extends DataSource{
 //	public static void main(String[] args) throws IOException {
 //
 //		JsonObject JSONFile = Json.createReader(JSONBootstrap.class.getResourceAsStream("/bikes.json")).readObject();
-//		Dataset Σ = DatasetFactory.createTxnMem() ;
-//		Σ.begin(ReadWrite.WRITE);
-//		JSON("/bikes.json",JSONFile, Σ);
-//		Σ.getNamedModel("G").write(new FileWriter("src/main/resources/bikes.ttl"), "TTL");
+//		Dataset G_source = DatasetFactory.createTxnMem() ;
+//		G_source.begin(ReadWrite.WRITE);
+//		JSON("/bikes.json",JSONFile, G_source);
+//		G_source.getNamedModel("G").write(new FileWriter("src/main/resources/bikes.ttl"), "TTL");
 //	}
 
-//	private static void JSON(String D, JsonObject φ,  Dataset Σ) {
-//		Value(φ,Σ,D);
+//	private static void JSON(String D, JsonObject φ,  Dataset G_source) {
+//		Value(φ,G_source,D);
 //	}
 	public void write(String file, String lang){
-		Σ.write(file,lang);
+		G_source.write(file,lang);
 	}
 
 	private void Value(JsonValue φ, String P, String implP) {
@@ -151,11 +151,11 @@ public class JSONBootstrap extends DataSource{
 		φ.keySet().forEach(k -> {
 			JsonValue v = φ.get(k);
 
-//			Σ.add(P+".has_"+k, RDF.type, RDF.Property);
-//			Σ.add( P+".has_"+k, RDFS.domain, new ResourceImpl(P) );
+//			G_source.add(P+".has_"+k, RDF.type, RDF.Property);
+//			G_source.add( P+".has_"+k, RDFS.domain, new ResourceImpl(P) );
 
-//			addTriple(Σ,"G",new ResourceImpl(P+".has_"+k), RDF.type, RDF.Property);
-//			addTriple(Σ,"G",new ResourceImpl(P+".has_"+k), RDFS.domain, new ResourceImpl(P));
+//			addTriple(G_source,"G",new ResourceImpl(P+".has_"+k), RDF.type, RDF.Property);
+//			addTriple(G_source,"G",new ResourceImpl(P+".has_"+k), RDFS.domain, new ResourceImpl(P));
 
 			String label = "has_" +k;
 			String property = P + "." + label;
@@ -170,15 +170,15 @@ public class JSONBootstrap extends DataSource{
 				LiteralNumber((JsonNumber) v, property, implP+"."+k);
 			} else if (v.getValueType() == JsonValue.ValueType.OBJECT) {
 				String u = k; ObjectCounter++;
-				Σ.add(createIRI(property), RDFS.range, createIRI(P+"."+u));
+				G_source.add(createIRI(property), RDFS.range, createIRI(P+"."+u));
 				Object((JsonObject)v,P+"."+u, P+"."+u);
 			}
 			else if (v.getValueType() == JsonValue.ValueType.ARRAY) {
 				String labelSeq = "Seq"+ SeqCounter;
 				String u = P +"." + labelSeq ; SeqCounter++;
-				Σ.add(createIRI(u), RDF.type, RDF.Seq);
-				Σ.addLiteral(createIRI(u), RDFS.label,labelSeq );
-				Σ.add( createIRI(P + ".has_" + k), RDFS.range, createIRI(u));
+				G_source.add(createIRI(u), RDF.type, RDF.Seq);
+				G_source.addLiteral(createIRI(u), RDFS.label,labelSeq );
+				G_source.add( createIRI(P + ".has_" + k), RDFS.range, createIRI(u));
 				Array((JsonArray) v, u, k, k);
 			} else if ( v.getValueType() == JsonValue.ValueType.NULL ) {
 				// I added v.getValueType() == JsonValue.ValueType.NULL because of this data https://github.com/cmoa/collection/blob/master/cmoa/00078d13-d7c7-4f1b-bbe2-b9afcc25fcbd.json
@@ -187,21 +187,21 @@ public class JSONBootstrap extends DataSource{
 				LiteralString( property, implP+"."+k);
 			}
 
-			Σ.add(createIRI(property), RDF.type, RDF.Property);
-			Σ.addLiteral(createIRI(property), RDFS.label, label);
-			Σ.add( createIRI(property), RDFS.domain, new ResourceImpl( createIRI(P) ) );
+			G_source.add(createIRI(property), RDF.type, RDF.Property);
+			G_source.addLiteral(createIRI(property), RDFS.label, label);
+			G_source.add( createIRI(property), RDFS.domain, new ResourceImpl( createIRI(P) ) );
 		});
-		Σ.add( createIRI(P) , RDF.type, RDFS.Class);
-		Σ.addLiteral( createIRI(P) , RDFS.label, P.substring(P.lastIndexOf('.') + 1));
+		G_source.add( createIRI(P) , RDF.type, RDFS.Class);
+		G_source.addLiteral( createIRI(P) , RDFS.label, P.substring(P.lastIndexOf('.') + 1));
 	}
 
 	private void Array (JsonArray φ, String P, String key, String implP) {
 		String label = "ContainerMembershipProperty"+CMPCounter;
 		String uu = P+"."+label; CMPCounter++;
 		String uuIRI = createIRI(uu);
-		Σ.add(uuIRI, RDF.type, RDFS.ContainerMembershipProperty);
-		Σ.addLiteral(uuIRI, RDFS.label, label);
-		Σ.add(uuIRI, RDFS.domain, createIRI(P));
+		G_source.add(uuIRI, RDF.type, RDFS.ContainerMembershipProperty);
+		G_source.addLiteral(uuIRI, RDFS.label, label);
+		G_source.add(uuIRI, RDFS.domain, createIRI(P));
 		// TODO: some ds have empty array, check below example images array
 //		https://github.com/cmoa/collection/blob/master/cmoa/00078d13-d7c7-4f1b-bbe2-b9afcc25fcbd.json
 		if(φ.size() > 0) {
@@ -210,7 +210,7 @@ public class JSONBootstrap extends DataSource{
 				Value(φ.get(0), uu, generateArrayAlias(P+"."+key));
 			} else if (v.getValueType() == JsonValue.ValueType.OBJECT) {
 				String u = key; ObjectCounter++;
-				Σ.add( uuIRI, RDFS.range, createIRI(P + "." + u) );
+				G_source.add( uuIRI, RDFS.range, createIRI(P + "." + u) );
 				Value(φ.get(0), P + "." + u, generateArrayAlias(P+"."+key));
 			}
 			lateralViews.add(Pair.of(removeSeqs(P+"."+key),generateArrayAlias(P+"."+key)));
@@ -223,17 +223,17 @@ public class JSONBootstrap extends DataSource{
 	}
 
 	private void LiteralString ( String P, String implP) {
-		Σ.add(createIRI(P),RDFS.range,XSD.xstring);
+		G_source.add(createIRI(P),RDFS.range,XSD.xstring);
 		attributes.add(Pair.of(P,implP));
 	}
 
 	private void LiteralString (JsonString φ,  String P, String implP) {
-		Σ.add(createIRI(P),RDFS.range,XSD.xstring);
+		G_source.add(createIRI(P),RDFS.range,XSD.xstring);
 		attributes.add(Pair.of(P,implP));
 	}
 
 	private void LiteralNumber (JsonNumber φ, String P, String implP) {
-		Σ.add( createIRI(P), RDFS.range, XSD.integer);
+		G_source.add( createIRI(P), RDFS.range, XSD.integer);
 		attributes.add(Pair.of(P,implP));
 	}
 
@@ -250,11 +250,11 @@ public class JSONBootstrap extends DataSource{
 		String ds = DataSourceVocabulary.DataSource.val() +"/" + name;
 		if (!id.equals("")){
 			ds = DataSourceVocabulary.DataSource.val() +"/" + id;
-			Σ.addLiteral( ds , DataSourceVocabulary.HAS_ID.val(), id);
+			G_source.addLiteral( ds , DataSourceVocabulary.HAS_ID.val(), id);
 		}
 		addBasicMetaData(name, path, ds);
-		Σ.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.JSON.val());
-		Σ.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
+		G_source.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.JSON.val());
+		G_source.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
 	}
 
 
