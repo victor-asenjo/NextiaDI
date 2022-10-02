@@ -12,6 +12,8 @@ public class Alignment implements Serializable {
 
     String iriA;
     String iriB;
+    String labelA;
+    String labelB;
     String l;
     String type;
     Boolean identifier;
