@@ -138,13 +138,13 @@ public class JSONBootstrapSWJ extends DataSource{
 		String u_prime = freshArray();
 		G_source.add(createIRI(u_prime),RDF.type,JSON_MM.Array);
 		if (D.size() > 0) {
-			DataType(D.get(0),p);
+			DataType(D.get(0), u_prime);
 		} else {
 			// TODO: some ds have empty array, check below example images array
 			G_source.add(createIRI(p),JSON_MM.hasValue,JSON_MM.String);
 		}
-//		G_source.add(createIRI(p),JSON_MM.hasMember,createIRI(u_prime));
-		G_source.add(createIRI(u_prime),JSON_MM.hasMember,createIRI(p));
+		G_source.add(createIRI(p),JSON_MM.hasValue,createIRI(u_prime));
+//		G_source.add(createIRI(u_prime),JSON_MM.hasMember,createIRI(p));
 	}
 
 	private void Primitive (JsonValue D, String p) {
@@ -256,7 +256,7 @@ public class JSONBootstrapSWJ extends DataSource{
 		JSONBootstrapSWJ j = new JSONBootstrapSWJ();
 		String D = "cmoa_sample.json";
 
-		Model M = j.bootstrapSchema("cmoa_data", D,"src/main/resources/cmoa_sample.json");
+		Model M = j.bootstrapSchema("cmoa_data", D,"src/main/resources/stations.json");
 
 		Graph G = new Graph();
 		G.setModel(M);
