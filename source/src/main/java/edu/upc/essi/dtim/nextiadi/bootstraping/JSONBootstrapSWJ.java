@@ -196,39 +196,59 @@ public class JSONBootstrapSWJ extends DataSource{
 		});
 
 		// Rule 2. Instances of J:Array are translated to instances of rdfs:Class and rdf:Seq .
-		G_source.runAQuery("SELECT ?a WHERE { ?a <"+RDF.type+"> <"+JSON_MM.Array+"> }").forEachRemaining(res -> {
-			G_target.add(res.getResource("a").getURI(),RDF.type,RDFS.Class); System.out.println("#2 - "+res.getResource("a").getURI()+", "+RDF.type+", "+RDFS.Class);
-			G_target.add(res.getResource("a").getURI(),RDF.type,RDF.Seq); System.out.println("#2 - "+res.getResource("a").getURI()+", "+RDF.type+", "+RDF.Seq);
-		});
+//		G_source.runAQuery("SELECT ?a WHERE { ?a <"+RDF.type+"> <"+JSON_MM.Array+"> }").forEachRemaining(res -> {
+//			G_target.add(res.getResource("a").getURI(),RDF.type,RDFS.Class); System.out.println("#2 - "+res.getResource("a").getURI()+", "+RDF.type+", "+RDFS.Class);
+//			G_target.add(res.getResource("a").getURI(),RDF.type,RDF.Seq); System.out.println("#2 - "+res.getResource("a").getURI()+", "+RDF.type+", "+RDF.Seq);
+//		});
 
-		// Rule 3. Instances of J:Key are translated to instances of rdf:Property . Additionally, this requires defining the rdfs:domain
+		// Rule 2. Instances of J:Key are translated to instances of rdf:Property . Additionally, this requires defining the rdfs:domain
 		//of such newly defined instance of rdf:Property .
 		G_source.runAQuery("SELECT ?o ?k WHERE { ?o <"+JSON_MM.hasKey+"> ?k }").forEachRemaining(res -> {
 			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property); System.out.println("#3 - "+res.getResource("k").getURI()+", "+RDF.type+", "+RDF.Property);
 			G_target.add(res.getResource("k").getURI(),RDFS.domain,res.getResource("o").getURI()); System.out.println("#3 - "+res.getResource("k").getURI()+", "+RDFS.domain+", "+res.getResource("o").getURI());
 		});
 
-		//Rule 4. The rdfs:range of an instance of J:Primitive is its corresponding counterpart in the xsd vocabulary. Below we
-		//show the case for instances of J:String whose counterpart is xsd:string . The procedure for instances of J:Number and
-		//J:Boolean is similar using their pertaining type.
-		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> <"+JSON_MM.String+"> . ?k <"+RDF.type+"> <"+JSON_MM.Key+"> }").forEachRemaining(res -> {
+		// Rule 3. Array keys are also ContainerMembershipProperty
+		G_source.runAQuery("SELECT ?o ?k WHERE { ?o <"+JSON_MM.hasKey+"> ?k . ?k <"+JSON_MM.hasValue+"> ?a . ?a <"+RDF.type+"> <"+JSON_MM.Array+"> }").forEachRemaining(res -> {
+			G_target.add(res.getResource("k").getURI(),RDF.type,RDFS.ContainerMembershipProperty);
+		});
+
+		//Rule 4. Range of primitives.
+		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+">+ <"+JSON_MM.String+"> . ?k <"+RDF.type+"> <"+JSON_MM.Key+"> }").forEachRemaining(res -> {
 //			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property); System.out.println("#4 - "+res.getResource("k").getURI()+", "+RDF.type+", "+RDF.Property);
 			G_target.add(res.getResource("k").getURI(),RDFS.range,XSD.xstring); System.out.println("#4 - "+res.getResource("k").getURI()+", "+RDFS.range+", "+XSD.xstring);
 		});
-		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> <"+JSON_MM.Number+"> }").forEachRemaining(res -> {
+		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+">+ <"+JSON_MM.Number+"> . ?k <"+RDF.type+"> <"+JSON_MM.Key+"> }").forEachRemaining(res -> {
 //			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property); System.out.println("#4 - "+res.getResource("k").getURI()+", "+RDF.type+", "+RDF.Property);
 			G_target.add(res.getResource("k").getURI(),RDFS.range,XSD.xint); System.out.println("#4 - "+res.getResource("k").getURI()+", "+RDFS.range+", "+XSD.xint);
 		});
 
-		//Rule 5. The rdfs:range of an instance of either J:Array or J:Object is the value itself.
-		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> ?v . ?v <"+RDF.type+"> <"+JSON_MM.Object+"> . ?k <"+RDF.type+"> <"+JSON_MM.Key+"> }").forEachRemaining(res -> {
+		//Rule 5. Range of objects.
+		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+">+ ?v . ?k <"+RDF.type+"> <"+JSON_MM.Key+"> . ?v <"+RDF.type+"> <"+JSON_MM.Object+"> }").forEachRemaining(res -> {
 //			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property); System.out.println("#5 - "+res.getResource("k").getURI()+", "+RDF.type+", "+RDF.Property);
-//?			G_target.add(res.getResource("k").getURI(),RDFS.range,res.getResource("v")); System.out.println("#5 - "+res.getResource("k").getURI()+", "+RDFS.range+", "+res.getResource("v"));
+			G_target.add(res.getResource("k").getURI(),RDFS.range,res.getResource("v")); System.out.println("#5 - "+res.getResource("k").getURI()+", "+RDFS.range+", "+res.getResource("v"));
 		});
+
+		//6- Range of arrays (objects)
+//		G_source.runAQuery("SELECT ?k ?x WHERE { ?k <"+JSON_MM.hasValue+"> ?v . ?v <"+JSON_MM.hasValue+">+ ?x . " +
+//				"?k <"+RDF.type+"> <"+JSON_MM.Key+"> . ?v <"+RDF.type+"> <"+JSON_MM.Array+"> . " +
+//				"?x <"+RDF.type+"> <"+JSON_MM.Object+">}").forEachRemaining(res -> {
+//			G_target.add(res.getResource("k").getURI(),RDFS.range,res.getResource("x")); System.out.println("#6 - "+res.getResource("k").getURI()+", "+RDFS.range+", "+res.getResource("v"));
+//		});
+
+/**
+		// Array of primitives
+
+		// Array of arrays
+
+
 		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> ?v . ?v <"+RDF.type+"> <"+JSON_MM.Array+"> . ?k <"+RDF.type+"> <"+JSON_MM.Key+"> }").forEachRemaining(res -> {
 //			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property); System.out.println("#5 - "+res.getResource("k").getURI()+", "+RDF.type+", "+RDF.Property);
 //?			G_target.add(res.getResource("k").getURI(),RDFS.range,res.getResource("v")); System.out.println("#5 - "+res.getResource("k").getURI()+", "+RDFS.range+", "+res.getResource("v"));
 		});
+
+		//Arrays of objects
+
 
 		//Rule 6. Instances of J:Primitive which are members of an instance of J:Array are connected to its corresponding
 		//counterpart in the xsd vocabulary using the rdfs:member property. We show the case for instances of J:String whose
@@ -243,13 +263,14 @@ public class JSONBootstrapSWJ extends DataSource{
 
 		//Rule 7. Instances of J:Object or J:Array which are members of an instance of J:Array are connected via the rdfs:member
 		//property.
-		G_source.runAQuery("SELECT ?d ?a WHERE { ?a <"+JSON_MM.hasValue+"> ?d . ?d <"+RDF.type+"> <"+JSON_MM.Object+"> }").forEachRemaining(res -> {
-			G_target.add(res.getResource("a").getURI(),RDFS.member,res.getResource("d")); System.out.println("#7 - "+res.getResource("a").getURI()+", "+RDFS.member+", "+res.getResource("d"));
+		G_source.runAQuery("SELECT ?k ?v WHERE { ?k <"+JSON_MM.hasValue+"> ?a . ?k <"+RDF.type+"> <"+JSON_MM.Key+"> . ?a <"+RDF.type+"> <"+JSON_MM.Array+"> " +
+				". ?a <"+JSON_MM.hasValue+"> ?v }").forEachRemaining(res -> {
+			G_target.add(res.getResource("k").getURI(),RDFS.member,res.getResource("v")); System.out.println("#7 - "+res.getResource("k").getURI()+", "+RDFS.member+", "+res.getResource("v"));
 		});
-		G_source.runAQuery("SELECT ?d ?a WHERE { ?a <"+JSON_MM.hasValue+"> ?d . ?d <"+RDF.type+"> <"+JSON_MM.Array+"> }").forEachRemaining(res -> {
-			G_target.add(res.getResource("a").getURI(),RDFS.member,res.getResource("d")); System.out.println("#7 - "+res.getResource("a").getURI()+", "+RDFS.member+", "+res.getResource("d"));
-		});
-
+//		G_source.runAQuery("SELECT ?d ?a WHERE { ?a <"+JSON_MM.hasValue+"> ?d . ?d <"+RDF.type+"> <"+JSON_MM.Array+"> }").forEachRemaining(res -> {
+//			G_target.add(res.getResource("a").getURI(),RDFS.member,res.getResource("d")); System.out.println("#7 - "+res.getResource("a").getURI()+", "+RDFS.member+", "+res.getResource("d"));
+//		});
+**/
 	}
 
 
@@ -257,7 +278,7 @@ public class JSONBootstrapSWJ extends DataSource{
 		JSONBootstrapSWJ j = new JSONBootstrapSWJ();
 		String D = "stations.json";
 
-		Model M = j.bootstrapSchema("cmoa_data", D,"src/main/resources/stations.json");
+		Model M = j.bootstrapSchema("stations", D,"src/main/resources/stations.json");
 
 		Graph G = new Graph();
 		G.setModel(M);
