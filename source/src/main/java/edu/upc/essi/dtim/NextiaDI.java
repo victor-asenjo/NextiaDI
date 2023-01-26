@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim;
 
+import edu.upc.essi.dtim.nextiadi.config.Namespaces;
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
 import edu.upc.essi.dtim.nextiadi.exceptions.NoDomainForPropertyException;
 import edu.upc.essi.dtim.nextiadi.exceptions.NoRangeForPropertyException;
@@ -128,8 +129,6 @@ public class NextiaDI {
                 } else {
                     graphO.add(a.getIriL(), RDF.type.getURI(), Vocabulary.IntegrationDProperty.val());
 
-//                    System.out.println(a.getIriL()+" - "+RDF.type.getURI()+" - "+Vocabulary.IntegrationDProperty.val());
-
                     graphO.add(a.getIriA(), RDFS.subPropertyOf.getURI(), a.getIriL());
                     graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriL());
 
@@ -145,6 +144,41 @@ public class NextiaDI {
 
         }
         return unused;
+    }
+
+    public Model JoinIntegration(String propertyA, String propertyB, String integratedLabel, String labelObject, String domainO, String rangeO) {
+
+        Alignment a = new Alignment();
+        a.setL(integratedLabel);
+        a.setIriB(propertyB);
+        a.setIriA(propertyA);
+
+        // for this type, we don't verify if domains are integrated, as this is join.
+        // TODO: handle propagation
+        graphO.add(a.getIriL(), RDF.type.getURI(), Vocabulary.IntegrationDProperty.val());
+        graphO.addLiteral(a.getIriL(), RDFS.label.getURI(), integratedLabel);
+        graphO.add(a.getIriA(), RDFS.subPropertyOf.getURI(), a.getIriL());
+        graphO.add(a.getIriB(), RDFS.subPropertyOf.getURI(), a.getIriL());
+        String range = graphO.getFlexibleRange(a);
+        graphO.add(a.getIriL(), RDFS.range.getURI(), range);
+        graphO.add(a.getIriL(), RDFS.domain.getURI(), domainO);
+
+        // for easy handle in odin, we are typing to JoinObjectProperty
+        graphO.add( Namespaces.NextiaDI.val() + labelObject, RDF.type.getURI(), Vocabulary.JoinObjectProperty.val());
+        graphO.addLiteral( Namespaces.NextiaDI.val() + labelObject, RDFS.label.getURI(), labelObject);
+        graphO.add( Namespaces.NextiaDI.val() + labelObject, RDFS.range.getURI(), rangeO);
+        graphO.add( Namespaces.NextiaDI.val() + labelObject, RDFS.domain.getURI(), domainO);
+        graphO.add( a.getIriL(), Vocabulary.JoinProperty.val() , Namespaces.NextiaDI.val() + labelObject  );
+
+
+
+        return graphO.getModel();
+    }
+
+    public Model JoinIntegration(Model integrated, String propertyA, String propertyB, String integratedLabel, String labelObject, String domainO, String rangeO) {
+
+        graphO.setModel(integrated);
+        return JoinIntegration(propertyA,  propertyB,  integratedLabel,  labelObject,  domainO, rangeO);
     }
 
     public List<Alignment> IntegrateObjectProperties(List<Alignment> ADP) {
