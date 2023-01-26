@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.nextiadi.bootstraping;
 
 import edu.upc.essi.dtim.nextiadi.bootstraping.metamodels.JSON_MM;
+import edu.upc.essi.dtim.nextiadi.bootstraping.utils.JSON_Aux;
 import edu.upc.essi.dtim.nextiadi.config.DataSourceVocabulary;
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,11 @@ public abstract class DataSource {
     //List of pairs, where left is the IRI in the graph and right is the attribute in the wrapper (this will create sameAs edges)
     protected List<Pair<String,String>> sourceAttributes;
 
+    //TODO: these attributesSWJ and resourcesLabelSWJ should be merged somehow...or optimize the code
+    protected HashMap<String, JSON_Aux> attributesSWJ;
+    protected List<String> resourcesLabelSWJ;
+
+    @Deprecated
     protected List<Pair<String,String>> attributes;
     protected List<Pair<String,String>> lateralViews;
     protected String id = "";
@@ -60,6 +67,8 @@ public abstract class DataSource {
         sourceAttributes = Lists.newArrayList();
 
         attributes = Lists.newArrayList();
+        attributesSWJ = new HashMap<>();
+        resourcesLabelSWJ = new ArrayList<>();
         lateralViews = Lists.newArrayList();
         id = "";
     }

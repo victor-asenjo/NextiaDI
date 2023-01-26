@@ -2,6 +2,7 @@ package edu.upc.essi.dtim.nextiadi.bootstraping;
 
 
 import edu.upc.essi.dtim.nextiadi.bootstraping.metamodels.JSON_MM;
+import edu.upc.essi.dtim.nextiadi.bootstraping.utils.JSON_Aux;
 import edu.upc.essi.dtim.nextiadi.config.DataSourceVocabulary;
 import edu.upc.essi.dtim.nextiadi.config.Formats;
 import edu.upc.essi.dtim.nextiadi.jena.Graph;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,9 +67,18 @@ public class JSONBootstrapSWJ extends DataSource{
 		G_source.getModel().setNsPrefixes(prefixes);
 //		G_source.write("/Users/javierflores/Documents/upc/projects/NextiaDI/source/source_schemas/source.ttl"  , Lang.TURTLE);
 
-		addMetaData(dataSourceName, dataSourceID, path);
-
 		productionRules_JSON_to_RDFS();
+
+		String SELECT = attributesSWJ.entrySet().stream().map( p -> {
+			if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath();
+			return  p.getValue().getPath() + " AS " + p.getValue().getLabel();
+		}).collect(Collectors.joining(","));
+
+		String FROM = dataSourceName;
+		String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode("+p.getLeft()+") AS "+p.getRight()).collect(Collectors.joining("\n"));
+		wrapper = "SELECT " + SELECT + " FROM " + dataSourceName + " " + LATERAL;
+
+		addMetaData(dataSourceName, dataSourceID, path);
 
 		return G_target.getModel().setNsPrefixes(prefixes);
 	}
@@ -114,49 +125,80 @@ public class JSONBootstrapSWJ extends DataSource{
 			e.printStackTrace();
 		}
 		G_source.add(createIRI(D), RDF.type, JSON_MM.Document);
-		Object(Json.createReader(fis).readValue().asJsonObject(),D);
+		Object(Json.createReader(fis).readValue().asJsonObject(),new JSON_Aux(D,"",""));
 	}
 
-	private void DataType(JsonValue D, String p) {
+	private void DataType(JsonValue D, JSON_Aux p) {
 		if (D.getValueType() == JsonValue.ValueType.OBJECT) Object((JsonObject)D, p);
 		else if (D.getValueType() == JsonValue.ValueType.ARRAY) Array((JsonArray)D, p);
 		else Primitive(D,p);
 	}
 
-	private void Object (JsonObject D, String p) {
+	private void Object (JsonObject D, JSON_Aux p) {
 		String u_prime = freshObject();
-		G_source.add(createIRI(u_prime),RDF.type,JSON_MM.Object);
+		String iri_u_prime = createIRI(u_prime);
+		G_source.add(iri_u_prime,RDF.type,JSON_MM.Object);
+		G_source.addLiteral(iri_u_prime, RDFS.label, p.getKey());
 		D.forEach((k,v)-> {
-			G_source.add(createIRI(k),RDF.type,JSON_MM.Key);
-			G_source.add(createIRI(u_prime),JSON_MM.hasKey,createIRI(k));
-			DataType(v,k);
+			String k_prime = freshAttribute(k);
+			resourcesLabelSWJ.add(k_prime);
+			String iri_k = createIRI( k_prime );
+			G_source.add(iri_k, RDF.type,JSON_MM.Key);
+			if( v.getValueType() == JsonValue.ValueType.OBJECT || v.getValueType() == JsonValue.ValueType.ARRAY)
+				G_source.addLiteral(iri_k, RDFS.label, "has "+k_prime);
+			else {
+				G_source.addLiteral(iri_k, RDFS.label, k_prime);
+			}
+			G_source.add(iri_u_prime,JSON_MM.hasKey,iri_k);
+			String path_tmp = p.getPath() +"."+k;
+			if(p.getPath().equals(""))
+				path_tmp = k;
+
+			DataType(v, new JSON_Aux(k, k_prime, path_tmp) );
 		});
-		G_source.add(createIRI(p),JSON_MM.hasValue, createIRI(u_prime));
+		G_source.add(createIRI(p.getLabel()),JSON_MM.hasValue, iri_u_prime);
 	}
 
-	private void Array (JsonArray D, String p) {
+	private String replaceLast(String string, String toReplace, String replacement) {
+		int pos = string.lastIndexOf(toReplace);
+		if (pos > -1) {
+			return string.substring(0, pos)
+					+ replacement
+					+ string.substring(pos + toReplace.length());
+		} else {
+			return string;
+		}
+	}
+
+	private void Array (JsonArray D, JSON_Aux p) {
 		String u_prime = freshArray();
-		G_source.add(createIRI(u_prime),RDF.type,JSON_MM.Array);
+		String iri_u_prime = createIRI(u_prime);
+		G_source.add(iri_u_prime,RDF.type,JSON_MM.Array);
+		G_source.addLiteral(iri_u_prime, RDFS.label, p.getKey());
 		if (D.size() > 0) {
-			DataType(D.get(0), u_prime);
+			DataType(D.get(0), new JSON_Aux(  u_prime, p.getLabel() ,  replaceLast(p.getPath(),p.getKey(), p.getKey()+"_view"  )  ));
 		} else {
 			// TODO: some ds have empty array, check below example images array
-			G_source.add(createIRI(p),JSON_MM.hasValue,JSON_MM.String);
+			G_source.add(createIRI(p.getKey()),JSON_MM.hasValue,JSON_MM.String);
 		}
-		G_source.add(createIRI(p),JSON_MM.hasValue,createIRI(u_prime));
+		lateralViews.add(Pair.of(p.getKey(), p.getKey()+"_view"));
+		G_source.add(createIRI(p.getKey()),JSON_MM.hasValue,iri_u_prime);
 //		G_source.add(createIRI(u_prime),JSON_MM.hasMember,createIRI(p));
 	}
 
-	private void Primitive (JsonValue D, String p) {
+	private void Primitive (JsonValue D, JSON_Aux p) {
+		resourcesLabelSWJ.add(p.getLabel());
 		if (D.getValueType() == JsonValue.ValueType.NUMBER) {
-			G_source.add(createIRI(p),JSON_MM.hasValue,JSON_MM.Number);
+			G_source.add(createIRI(p.getLabel()),JSON_MM.hasValue,JSON_MM.Number);
+			attributesSWJ.put(p.getLabel(),p);
 		}
 		// Boolean does not exist in the library
 		//else if (D.getValueType() == JsonValue.ValueType.BOOLEAN) {
 		//			G_source.add(createIRI(p),JSON_MM.hasValue,JSON_MM.Boolean);
 		//		}
 		else {
-			G_source.add(createIRI(p),JSON_MM.hasValue,JSON_MM.String);
+			G_source.add(createIRI(p.getLabel()),JSON_MM.hasValue,JSON_MM.String);
+			attributesSWJ.put(p.getLabel(),p);
 		}
 	}
 
@@ -171,19 +213,32 @@ public class JSONBootstrapSWJ extends DataSource{
 		return "Object_"+getObjectCounter();
 	}
 
+	private String freshAttribute( String attribute ) {
+		String att = attribute;
+		int cont = 2;
+		while(attributesSWJ.containsKey(att) || resourcesLabelSWJ.contains(att)) {
+			att = attribute + cont;
+			cont = cont +1;
+		}
+		return att;
+	}
+
 	private String freshArray() {
 		setArrayCounter(getArrayCounter()+1);
 		return "Array_"+getArrayCounter();
 	}
 
+	public void prueba(){}
+
 	private void addMetaData(String name, String id, String path){
 		String ds = DataSourceVocabulary.DataSource.val() +"/" + name;
 		if (!id.equals("")){
 			ds = DataSourceVocabulary.DataSource.val() +"/" + id;
-			G_source.addLiteral( ds , DataSourceVocabulary.HAS_ID.val(), id);
+			G_target.addLiteral( ds , DataSourceVocabulary.HAS_ID.val(), id);
 		}
 		addBasicMetaData(name, path, ds);
-		G_source.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.JSON.val());
+		G_target.addLiteral( ds , DataSourceVocabulary.HAS_FORMAT.val(), Formats.JSON.val());
+		G_target.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
 		//TODO fix for the queries
 		//G_source.addLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.val(), wrapper);
 	}
@@ -191,8 +246,10 @@ public class JSONBootstrapSWJ extends DataSource{
 
 	private void productionRules_JSON_to_RDFS() {
 		// Rule 1. Instances of J:Object are translated to instances of rdfs:Class .
-		G_source.runAQuery("SELECT ?o WHERE { ?o <"+RDF.type+"> <"+JSON_MM.Object+"> }").forEachRemaining(res -> {
-			G_target.add(res.getResource("o").getURI(),RDF.type,RDFS.Class); System.out.println("#1 - "+res.getResource("o").getURI()+", "+RDF.type+", "+RDFS.Class);
+		G_source.runAQuery("SELECT ?o ?label WHERE { ?o <"+RDF.type+"> <"+JSON_MM.Object+">. ?o <"+RDFS.label+"> ?label }").forEachRemaining(res -> {
+			G_target.add(res.getResource("o").getURI(),RDF.type,RDFS.Class);
+			G_target.addLiteral(res.getResource("o").getURI(),RDFS.label, res.getLiteral("label") );
+			System.out.println("#1 - "+res.getResource("o").getURI()+", "+RDF.type+", "+RDFS.Class);
 		});
 
 		// Rule 2. Instances of J:Array are translated to instances of rdfs:Class and rdf:Seq .
@@ -203,8 +260,9 @@ public class JSONBootstrapSWJ extends DataSource{
 
 		// Rule 2. Instances of J:Key are translated to instances of rdf:Property . Additionally, this requires defining the rdfs:domain
 		//of such newly defined instance of rdf:Property .
-		G_source.runAQuery("SELECT ?o ?k WHERE { ?o <"+JSON_MM.hasKey+"> ?k }").forEachRemaining(res -> {
+		G_source.runAQuery("SELECT ?o ?k ?label WHERE { ?o <"+JSON_MM.hasKey+"> ?k. ?k <"+RDFS.label+"> ?label   }").forEachRemaining(res -> {
 			G_target.add(res.getResource("k").getURI(),RDF.type,RDF.Property); System.out.println("#3 - "+res.getResource("k").getURI()+", "+RDF.type+", "+RDF.Property);
+			G_target.addLiteral(res.getResource("k").getURI(),RDFS.label, res.getLiteral("label") );
 			G_target.add(res.getResource("k").getURI(),RDFS.domain,res.getResource("o").getURI()); System.out.println("#3 - "+res.getResource("k").getURI()+", "+RDFS.domain+", "+res.getResource("o").getURI());
 		});
 
@@ -278,7 +336,8 @@ public class JSONBootstrapSWJ extends DataSource{
 		JSONBootstrapSWJ j = new JSONBootstrapSWJ();
 		String D = "stations.json";
 
-		Model M = j.bootstrapSchema("stations", D,"src/main/resources/stations.json");
+//		Model M = j.bootstrapSchema("ds1", D,"/Users/javierflores/Documents/upc/projects/newODIN/datasources/survey_prueba/selected/tate_artist_picasso-pablo-1767.json");
+		Model M = j.bootstrapSchema("stations", D,"src/main/resources/prueba_presentacion.json");
 
 		Graph G = new Graph();
 		G.setModel(M);
@@ -287,7 +346,7 @@ public class JSONBootstrapSWJ extends DataSource{
 		G.write(temp.toString(), Lang.TURTLE);
 
 		System.out.println("Attributes");
-		System.out.println(j.getAttributes());
+		System.out.println(j.getAttributesSWJ());
 
 		System.out.println("Source attributes");
 		System.out.println(j.getSourceAttributes());
@@ -296,14 +355,21 @@ public class JSONBootstrapSWJ extends DataSource{
 		System.out.println(j.getLateralViews());
 
 
-		List<Pair<String,String>> attributes = j.getAttributes();
+		HashMap<String, JSON_Aux> attributes = j.getAttributesSWJ();
 		List<Pair<String,String>> lateralViews = j.getLateralViews();
 
-		String SELECT = attributes.stream().map(p -> {
-			if (p.getLeft().equals(p.getRight())) return p.getLeft();
-			else if (p.getLeft().contains("ContainerMembershipProperty")) return p.getRight();
-			return p.getRight() + " AS " + p.getRight().replace(".","_");
+		String SELECT = attributes.entrySet().stream().map( p -> {
+			if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath();
+//			else if (p.getKey().contains("ContainerMembershipProperty")) return p.getValue();
+			return  p.getValue().getPath() + " AS " + p.getValue().getLabel();
 		}).collect(Collectors.joining(","));
+
+
+//		String SELECT = attributes.stream().map(p -> {
+//			if (p.getLeft().equals(p.getRight())) return p.getLeft();
+//			else if (p.getLeft().contains("ContainerMembershipProperty")) return p.getRight();
+//			return p.getRight() + " AS " + p.getRight().replace(".","_");
+//		}).collect(Collectors.joining(","));
 		String FROM = D;
 		String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode("+p.getLeft()+") AS "+p.getRight()).collect(Collectors.joining("\n"));
 
@@ -311,8 +377,8 @@ public class JSONBootstrapSWJ extends DataSource{
 		System.out.println(impl);
 
 
-		j.getG_source().write("src/main/resources/stations_source.ttl", Lang.TURTLE);
-		j.getG_target().write("src/main/resources/stations_target.ttl", Lang.TURTLE);
+		j.getG_source().write("src/main/resources/stations_source2.ttl", Lang.TURTLE);
+		j.getG_target().write("src/main/resources/stations_target2.ttl", Lang.TURTLE);
 	}
 }
 

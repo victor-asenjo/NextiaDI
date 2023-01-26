@@ -10,13 +10,13 @@ import java.io.Serializable;
 @Setter
 public class Alignment implements Serializable {
 
-    String iriA;
-    String iriB;
-    String labelA;
-    String labelB;
-    String l;
-    String type;
-    Boolean identifier;
+    public String iriA;
+    public String iriB;
+    public String labelA;
+    public String labelB;
+    public String l;
+    public String type;
+    public Boolean identifier;
 //    String score?
 
     public Alignment(){

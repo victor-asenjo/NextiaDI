@@ -6,7 +6,10 @@ public enum Vocabulary {
 
     IntegrationClass(Namespaces.NextiaDI.val() + "IntegratedClass"),
     IntegrationDProperty( Namespaces.NextiaDI.val() + "IntegratedDatatypeProperty"),
-    IntegrationOProperty( Namespaces.NextiaDI.val() + "IntegratedObjectProperty");
+    IntegrationOProperty( Namespaces.NextiaDI.val() + "IntegratedObjectProperty"),
+
+    JoinProperty(Namespaces.NextiaDI.val() + "JoinProperty"),
+    JoinObjectProperty(Namespaces.NextiaDI.val() + "JoinObjectProperty");
 
     private String element;
 

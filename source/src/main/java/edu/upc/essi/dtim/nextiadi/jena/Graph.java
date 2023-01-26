@@ -8,6 +8,7 @@ import edu.upc.essi.dtim.nextiadi.models.Subject;
 import lombok.Getter;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.impl.LiteralImpl;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
@@ -52,6 +53,10 @@ public class Graph {
     }
 
     public void addLiteral(String subject, Property predicate, String literal) {
+        Resource r = model.createResource(subject);
+        r.addProperty(predicate, literal);
+    }
+    public void addLiteral(String subject, Property predicate, Literal literal) {
         Resource r = model.createResource(subject);
         r.addProperty(predicate, literal);
     }
@@ -147,7 +152,7 @@ public class Graph {
     }
 
     public Model generateOnlyIntegrations(){
-        // Look and update triples where oldIRI is object.
+
         String querySTR = "CONSTRUCT {?s ?p ?o. ?sub ?p1 ?s.} " +
                 "WHERE { " +
                 "?sub ?p1 ?s." +
@@ -160,12 +165,14 @@ public class Graph {
                 " ?s ?p ?o. " +
                 "}" +
                 " UNION { " +
-                "?s <"+RDF.type.getURI()+"> <"+ Vocabulary.IntegrationOProperty +">. " +
+                "?s <"+RDF.type.getURI()+"> <"+ Vocabulary.IntegrationOProperty.val() +">. " +
+                " ?s ?p ?o. " +
+                "}" +
+                " UNION { " +
+                "?s <"+RDF.type.getURI()+"> <"+ Vocabulary.JoinObjectProperty.val() +">. " +
                 " ?s ?p ?o. " +
                 "}" +
                 "}";
-
-
 
         Query query = QueryFactory.create(querySTR);
         QueryExecution qexec = QueryExecutionFactory.create(query, model);

@@ -264,48 +264,48 @@ public class JSONBootstrap extends DataSource{
 
 
 	public static void main(String[] args) throws IOException {
-		JSONBootstrap j = new JSONBootstrap();
-		String D = "ds2";
-
-		Model M = j.bootstrapSchema(D,"/Users/javierflores/Documents/upc/projects/newODIN/datasources/survey_prueba/selected/tate_artist_picasso-pablo-1767.json");
-
-		Graph G = new Graph();
-		G.setModel(M);
-		G.write("/Users/javierflores/Documents/upc/projects/NextiaDI/source/source_schemas/per.ttl",org.apache.jena.riot.Lang.TTL);
 //		JSONBootstrap j = new JSONBootstrap();
-//		String D = "stations";
+//		String D = "ds2";
 //
-//		Model M = j.bootstrapSchema(D,"src/main/resources/stations.json");
+//		Model M = j.bootstrapSchema(D,"/Users/javierflores/Documents/upc/projects/newODIN/datasources/survey_prueba/selected/tate_artist_picasso-pablo-1767.json");
 //
 //		Graph G = new Graph();
 //		G.setModel(M);
+//		G.write("/Users/javierflores/Documents/upc/projects/NextiaDI/source/source_schemas/per.ttl",org.apache.jena.riot.Lang.TTL);
+		JSONBootstrap j = new JSONBootstrap();
+		String D = "stations";
+
+		Model M = j.bootstrapSchema(D,"src/main/resources/stations.json");
+
+		Graph G = new Graph();
+		G.setModel(M);
 //		java.nio.file.Path temp = Files.createTempFile("bootstrap",".ttl");
 //		System.out.println("Graph written to "+temp);
-//		G.write(temp.toString(),org.apache.jena.riot.Lang.TTL);
-//
-//		System.out.println("Attributes");
-//		System.out.println(j.getAttributes());
-//
-//		System.out.println("Source attributes");
-//		System.out.println(j.getSourceAttributes());
-//
-//		System.out.println("Lateral views");
-//		System.out.println(j.getLateralViews());
-//
-//
-//		List<Pair<String,String>> attributes = j.getAttributes();
-//		List<Pair<String,String>> lateralViews = j.getLateralViews();
-//
-//		String SELECT = attributes.stream().map(p -> {
-//			if (p.getLeft().equals(p.getRight())) return p.getLeft();
-//			else if (p.getLeft().contains("ContainerMembershipProperty")) return p.getRight();
-//			return p.getRight() + " AS " + p.getRight().replace(".","_");
-//		}).collect(Collectors.joining(","));
-//		String FROM = D;
-//		String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode("+p.getLeft()+") AS "+p.getRight()).collect(Collectors.joining("\n"));
-//
-//		String impl = "SELECT " + SELECT + " FROM " + D + " " + LATERAL;
-//		System.out.println(impl);
+		G.write("src/main/resources/stations_old.ttl",org.apache.jena.riot.Lang.TTL);
+
+		System.out.println("Attributes");
+		System.out.println(j.getAttributes());
+
+		System.out.println("Source attributes");
+		System.out.println(j.getSourceAttributes());
+
+		System.out.println("Lateral views");
+		System.out.println(j.getLateralViews());
+
+
+		List<Pair<String,String>> attributes = j.getAttributes();
+		List<Pair<String,String>> lateralViews = j.getLateralViews();
+
+		String SELECT = attributes.stream().map(p -> {
+			if (p.getLeft().equals(p.getRight())) return p.getLeft();
+			else if (p.getLeft().contains("ContainerMembershipProperty")) return p.getRight();
+			return p.getRight() + " AS " + p.getRight().replace(".","_");
+		}).collect(Collectors.joining(","));
+		String FROM = D;
+		String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode("+p.getLeft()+") AS "+p.getRight()).collect(Collectors.joining("\n"));
+
+		String impl = "SELECT " + SELECT + " FROM " + D + " " + LATERAL;
+		System.out.println(impl);
 	}
 }
 
