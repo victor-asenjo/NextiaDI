@@ -125,7 +125,15 @@ public class JSONBootstrapSWJ extends DataSource{
 			e.printStackTrace();
 		}
 		G_source.add(createIRI(D), RDF.type, JSON_MM.Document);
-		Object(Json.createReader(fis).readValue().asJsonObject(),new JSON_Aux(D,"",""));
+
+//		try {
+			Object(Json.createReader(fis).readValue().asJsonObject(),new JSON_Aux(D,"",""));
+//		} catch (ClassCastException e){
+//			Array(Json.createReader(fis).readValue().asJsonArray(), new JSON_Aux(D,"",""));
+//		}
+
+
+
 	}
 
 	private void DataType(JsonValue D, JSON_Aux p) {

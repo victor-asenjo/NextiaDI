@@ -15,7 +15,7 @@ class CSVBootstrapTest {
 
         CSVBootstrap csv = new CSVBootstrap();
 
-        Model result = csv.bootstrapSchema("file:///cities.csv",getClass().getClassLoader().getResource("bootstraping/cities.csv").getPath());
+        Model result = csv.bootstrapSchema("file:///cities.csv", "name",getClass().getClassLoader().getResource("bootstraping/cities.csv").getPath());
 
         Model expected = ModelFactory.createDefaultModel();
         expected.read(getClass().getClassLoader()

@@ -35,25 +35,26 @@ public class CSVBootstrap extends DataSource{
 	}
 
 
-	public Model bootstrapSchema(String id, String name, String namespace, String path) throws IOException {
+	public Model bootstrapSchema(String id, String name, String path) throws IOException {
 		G_source = new Graph();
-		String P = namespace;
+		this.id = id;
 
 		BufferedReader br = new BufferedReader(new FileReader(path));
 		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
 
-		G_source.add(createIRI(P), RDF.type, RDFS.Class);
+		G_source.add(createIRI(name), RDF.type, RDFS.Class);
+		G_source.addLiteral(createIRI(name), RDFS.label, name);
 		parser.getHeaderNames().forEach(h -> {
 			String h2 = h.replace("\"", "").trim();
 //			System.out.println(h2);
-			G_source.add(createIRI(P+"."+h2),RDF.type,RDF.Property);
-			G_source.add(createIRI(P+"."+h2),RDFS.domain,createIRI(P));
-			G_source.add(createIRI(P+"."+h2),RDFS.range,XSD.xstring);
-			G_source.addLiteral(createIRI(P+"."+h2), RDFS.label,h2 );
+			G_source.add(createIRI(h2),RDF.type,RDF.Property);
+			G_source.add(createIRI(h2),RDFS.domain,createIRI(name));
+			G_source.add(createIRI(h2),RDFS.range,XSD.xstring);
+			G_source.addLiteral(createIRI(h2), RDFS.label,h2 );
 		});
 
 		String select =  parser.getHeaderNames().stream().map(a ->{ return  a +" AS "+ a.replace(".","_"); }).collect(Collectors.joining(","));
-		wrapper = "SELECT " + select  + " FROM " + namespace;
+		wrapper = "SELECT " + select  + " FROM " + name;
 		addMetaData( name, id, path);
 		G_source.getModel().setNsPrefixes(prefixes);
 		return G_source.getModel();
@@ -78,7 +79,7 @@ public class CSVBootstrap extends DataSource{
 
 		String pathcsv = "/Users/javierflores/Documents/datasets/1/artworks.csv";
 		CSVBootstrap csv = new CSVBootstrap();
-		Model m =csv.bootstrapSchema("","artworks","d", pathcsv);
+		Model m =csv.bootstrapSchema("12","artworks", pathcsv);
 		m.write(System.out, "Turtle");
 	}
 
