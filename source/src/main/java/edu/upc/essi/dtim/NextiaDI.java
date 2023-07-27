@@ -293,6 +293,14 @@ public class NextiaDI {
     }
 
 
+    public Model generateMinimalGraph(Model integratedGraph){
+        Graph minimalG = new Graph();
+        minimalG.setModel(integratedGraph);
+        minimalG.minimalOverClasses();
+        minimalG.minimalOverDataProperties();
+        return minimalG.getModel();
+    }
+
 
 
 //    public void findProperties(Class<?> concept) {
